@@ -3,26 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --primary: #0a1172;
-  --primary-light: #1a2cff;
-  --primary-dark: #060b45;
-  --accent: #00c853;
-  --accent-light: #5efc82;
-  --accent-dark: #009624;
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --primary: 10, 17, 114; /* #0a1172 */
+  --primary-light: 26, 44, 255; /* #1a2cff */
+  --primary-dark: 6, 11, 69; /* #060b45 */
+  --accent: 0, 200, 83; /* #00c853 */
+  --accent-light: 94, 252, 130; /* #5efc82 */
+  --accent-dark: 0, 150, 36; /* #009624 */
+  --background: 248, 250, 252; /* #f8fafc */
+  --foreground: 15, 23, 42; /* #0f172a */
+  --card: 255, 255, 255;
+  --card-foreground: 15, 23, 42;
+  --popover: 255, 255, 255;
+  --popover-foreground: 15, 23, 42;
+  --muted: 241, 245, 249;
+  --muted-foreground: 100, 116, 139;
+  --border: 226, 232, 240;
+  --input: 226, 232, 240;
+  --ring: 10, 17, 114;
+
+  --radius: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-  }
+.dark {
+  --background: 15, 23, 42; /* #0f172a */
+  --foreground: 248, 250, 252; /* #f8fafc */
+  --card: 30, 41, 59;
+  --card-foreground: 248, 250, 252;
+  --popover: 30, 41, 59;
+  --popover-foreground: 248, 250, 252;
+  --muted: 51, 65, 85;
+  --muted-foreground: 148, 163, 184;
+  --border: 51, 65, 85;
+  --input: 51, 65, 85;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
 }
 
 .wave-bg {
@@ -74,6 +91,43 @@ body {
   }
 }
 
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, rgb(var(--primary)), rgb(var(--primary-light)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--primary-light)));
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-light)));
+}
+
 @layer components {
   .card {
     @apply bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg;
@@ -89,5 +143,21 @@ body {
 
   .btn-outline {
     @apply border border-primary text-primary hover:bg-primary hover:text-white font-bold py-2 px-4 rounded-lg transition-all duration-300;
+  }
+
+  .container {
+    @apply max-w-7xl mx-auto px-4;
+  }
+
+  .section {
+    @apply py-16 md:py-24;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold mb-6 md:mb-10;
+  }
+
+  .section-subtitle {
+    @apply text-xl md:text-2xl font-semibold mb-4;
   }
 }
