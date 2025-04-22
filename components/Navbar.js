@@ -161,10 +161,14 @@ export default function Navbar() {
                 <MessageSquare size={20} />
               </button>
 
-              <button className="ml-2 bg-accent hover:bg-accent-light text-white font-medium py-2 px-4 rounded-full transition-all duration-300 flex items-center">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="ml-2 bg-gradient-to-r from-accent to-accent-light text-white font-medium py-2 px-4 rounded-full transition-all duration-300 flex items-center shadow-lg shadow-accent/20 hover:shadow-accent/40"
+              >
                 <Wallet size={16} className="mr-2" />
                 Connect Wallet
-              </button>
+              </motion.button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -233,7 +237,7 @@ export default function Navbar() {
                 </Link>
 
                 <div className="pt-2 border-t border-gray-200">
-                  <button className="w-full bg-accent hover:bg-accent-light text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center">
+                  <button className="w-full bg-gradient-to-r from-accent to-accent-light text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg">
                     <Wallet size={18} className="mr-2" />
                     Connect Wallet
                   </button>

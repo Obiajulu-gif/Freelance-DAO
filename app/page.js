@@ -22,6 +22,46 @@ import {
   Cpu,
 } from "lucide-react"
 
+// Typewriter effect component
+const TypewriterText = ({ text }) => {
+  const [displayText, setDisplayText] = useState("")
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText((prev) => prev + text[currentIndex])
+        setCurrentIndex((prev) => prev + 1)
+      }, 40) // Speed of typing
+
+      return () => clearTimeout(timeout)
+    }
+  }, [currentIndex, text])
+
+  return (
+    <span className="relative">
+      {displayText}
+      <span
+        className={`absolute right-[-4px] top-0 h-full w-[2px] bg-accent-light ${currentIndex < text.length ? "animate-blink" : "opacity-0"}`}
+      ></span>
+    </span>
+  )
+}
+
+// Marquee component
+const Marquee = ({ children, speed = 30 }) => {
+  return (
+    <div className="overflow-hidden whitespace-nowrap relative w-full">
+      <div className="animate-marquee inline-block" style={{ animationDuration: `${speed}s` }}>
+        {children}
+      </div>
+      <div className="animate-marquee2 inline-block absolute top-0" style={{ animationDuration: `${speed}s` }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [category, setCategory] = useState("web3")
   const heroRef = useRef(null)
@@ -46,7 +86,10 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section - Upwork Style with Web3 Elements */}
-      <section ref={heroRef} className="relative min-h-[85vh] flex items-center bg-gradient-primary overflow-hidden">
+      <section
+        ref={heroRef}
+        className="relative min-h-[100vh] flex items-center bg-gradient-primary overflow-hidden pt-16 md:pt-0"
+      >
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-blue-400/20 blur-3xl animate-float"></div>
@@ -92,9 +135,9 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-lg md:text-xl mb-8 text-white/90 max-w-lg"
+                className="text-lg md:text-xl mb-8 text-white/90 max-w-lg h-16 md:h-auto"
               >
-                The first decentralized freelancing platform built on Solana, where talent and opportunity connect.
+                <TypewriterText text="The first decentralized freelancing platform built on Solana, where talent and opportunity connect." />
               </motion.p>
 
               {/* Talent Categories */}
@@ -106,15 +149,19 @@ export default function Home() {
               >
                 <div className="flex flex-wrap gap-2 mb-4">
                   {categories.map((cat) => (
-                    <button
+                    <motion.button
                       key={cat.id}
                       onClick={() => setCategory(cat.id)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                        category === cat.id ? "bg-white text-primary" : "bg-white/10 text-white hover:bg-white/20"
+                        category === cat.id
+                          ? "bg-white text-primary shadow-lg"
+                          : "bg-white/10 text-white hover:bg-white/20"
                       }`}
                     >
                       {cat.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </motion.div>
@@ -137,7 +184,7 @@ export default function Home() {
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="bg-primary hover:bg-primary-light text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
+                  className="bg-gradient-to-r from-accent to-accent-light text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg shadow-accent/20 hover:shadow-accent/40"
                 >
                   Find Talent
                 </motion.button>
@@ -151,13 +198,22 @@ export default function Home() {
                 className="flex flex-wrap items-center gap-2 mt-4"
               >
                 <span className="text-sm text-white/70">Popular:</span>
-                <Link href="#" className="text-sm text-white hover:text-accent-light underline underline-offset-2">
+                <Link
+                  href="#"
+                  className="text-sm text-white hover:text-accent-light underline underline-offset-2 transition-colors duration-300"
+                >
                   Smart Contract
                 </Link>
-                <Link href="#" className="text-sm text-white hover:text-accent-light underline underline-offset-2">
+                <Link
+                  href="#"
+                  className="text-sm text-white hover:text-accent-light underline underline-offset-2 transition-colors duration-300"
+                >
                   Solana Developer
                 </Link>
-                <Link href="#" className="text-sm text-white hover:text-accent-light underline underline-offset-2">
+                <Link
+                  href="#"
+                  className="text-sm text-white hover:text-accent-light underline underline-offset-2 transition-colors duration-300"
+                >
                   Web3 Design
                 </Link>
               </motion.div>
@@ -172,7 +228,10 @@ export default function Home() {
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary-light/20 to-accent/20 rounded-xl transform rotate-3"></div>
-                <div className="glass-card rounded-xl p-6 relative z-10">
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                  className="glass-card rounded-xl p-6 relative z-10"
+                >
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center">
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -216,11 +275,15 @@ export default function Home() {
                         TK
                       </div>
                     </div>
-                    <button className="bg-primary hover:bg-primary-light text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-gradient-to-r from-accent to-accent-light text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+                    >
                       View Profile
-                    </button>
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -237,41 +300,44 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Trusted Companies Section with Marquee */}
       <section className="py-10 px-4 bg-white">
         <div className="container">
           <p className="text-center text-gray-500 mb-6">Trusted by leading web3 companies</p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-            <motion.div
-              whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-              className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
-            >
-              <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-              className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
-            >
-              <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-              className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
-            >
-              <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-              className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
-            >
-              <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-              className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
-            >
-              <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
-            </motion.div>
-          </div>
+          <Marquee speed={30}>
+            <div className="flex items-center gap-16 px-4">
+              <motion.div
+                whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+              >
+                <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
+              </motion.div>
+              <motion.div
+                whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+              >
+                <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
+              </motion.div>
+              <motion.div
+                whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+              >
+                <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
+              </motion.div>
+              <motion.div
+                whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+              >
+                <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
+              </motion.div>
+              <motion.div
+                whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+              >
+                <Image src="/placeholder.svg" alt="Company Logo" width={80} height={30} />
+              </motion.div>
+            </div>
+          </Marquee>
         </div>
       </section>
 
@@ -438,7 +504,7 @@ export default function Home() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/register"
-                className="btn-primary flex items-center bg-gradient-primary px-6 py-3 rounded-full shadow-lg"
+                className="btn-primary flex items-center bg-gradient-to-r from-accent to-accent-light px-6 py-3 rounded-full shadow-lg"
               >
                 Get Started <ArrowRight size={16} className="ml-2" />
               </Link>
@@ -529,7 +595,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-gradient-primary text-white relative overflow-hidden">
+      <section className="py-16 px-4 bg-gradient-to-r from-primary to-primary-light text-white relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 -right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl"></div>
@@ -563,7 +629,7 @@ export default function Home() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/freelancers"
-                className="btn-primary bg-gradient-primary shadow-lg shadow-primary/20 px-6 py-3 rounded-full"
+                className="btn-primary bg-gradient-to-r from-primary to-primary-light shadow-lg shadow-primary/20 px-6 py-3 rounded-full"
               >
                 Find Talent
               </Link>
@@ -571,7 +637,7 @@ export default function Home() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/register"
-                className="btn-secondary bg-gradient-accent shadow-lg shadow-accent/20 px-6 py-3 rounded-full"
+                className="btn-secondary bg-gradient-to-r from-accent to-accent-light shadow-lg shadow-accent/20 px-6 py-3 rounded-full"
               >
                 Start Freelancing
               </Link>
@@ -579,133 +645,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="font-bold text-lg mb-4">For Clients</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    How to Hire
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Talent Marketplace
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Project Catalog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Enterprise
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">For Talent</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    How to Find Work
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Direct Contracts
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Find Freelance Jobs
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Help & Support
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Success Stories
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Community
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Blog
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Leadership
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Investor Relations
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-300 hover:text-white">
-                    Careers
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <Image src="/logo.png" alt="FreeLance DAO" width={40} height={40} className="mr-2" />
-              <span className="font-bold text-xl">FreeLance DAO</span>
-            </div>
-            <div className="flex space-x-6">
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Terms of Service
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Privacy Policy
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Cookie Settings
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Accessibility
-              </Link>
-            </div>
-          </div>
-
-          <div className="text-center text-gray-400 text-sm mt-8">
-            © {new Date().getFullYear()} FreeLance DAO. All rights reserved.
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
