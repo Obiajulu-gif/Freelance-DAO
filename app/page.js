@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useScroll, useTransform, useAnimation } from "framer-motion"
-import { useInView } from "react-intersection-observer"
 import Modal from "@/components/Modal"
 import {
   Search,
@@ -16,14 +15,8 @@ import {
   DollarSign,
   Award,
   Briefcase,
-  Clock,
   Shield,
-  Zap,
-  Globe,
   Code,
-  Cpu,
-  X,
-  Check,
 } from "lucide-react"
 
 // Typewriter effect component
@@ -46,7 +39,9 @@ const TypewriterText = ({ text }) => {
     <span className="relative">
       {displayText}
       <span
-        className={`absolute right-[-4px] top-0 h-full w-[2px] bg-accent-light ${currentIndex < text.length ? "animate-blink" : "opacity-0"}`}
+        className={`absolute right-[-4px] top-0 h-full w-[2px] bg-accent-light ${
+          currentIndex < text.length ? "animate-blink" : "opacity-0"
+        }`}
       ></span>
     </span>
   )
@@ -66,13 +61,46 @@ const Marquee = ({ children, speed = 30 }) => {
   )
 }
 
+// Custom hook to replace react-intersection-observer
+const useInView = (options = {}) => {
+  const [isInView, setIsInView] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting)
+
+        // If we only want to trigger once and it's in view, unobserve
+        if (options.triggerOnce && entry.isIntersecting) {
+          observer.unobserve(entry.target)
+        }
+      },
+      {
+        threshold: options.threshold || 0.1,
+        rootMargin: options.rootMargin || "0px",
+      },
+    )
+
+    const currentRef = ref.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [options.threshold, options.rootMargin, options.triggerOnce])
+
+  return [ref, isInView]
+}
+
 // Animation for sections
 const FadeInWhenVisible = ({ children, delay = 0, direction = null }) => {
   const controls = useAnimation()
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
 
   useEffect(() => {
     if (inView) {
@@ -102,6 +130,195 @@ const FadeInWhenVisible = ({ children, delay = 0, direction = null }) => {
     <motion.div ref={ref} animate={controls} initial="hidden" variants={variants}>
       {children}
     </motion.div>
+  )
+}
+
+// Category Card Component
+function CategoryCard({ title, description, icon, skills, onClick }) {
+  return (
+    <motion.div
+      whileHover={{
+        y: -8,
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      }}
+      className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="text-primary mb-4">{icon}</div>
+      <h3 className="font-bold text-lg mb-1">{title}</h3>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{description}</p>
+
+      <div className="flex flex-wrap gap-2">
+        {skills.map((skill, index) => (
+          <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+            {skill}
+          </span>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+// Job Card Component
+function JobCard({ title, budget, duration, skills, company, featured, onClick }) {
+  return (
+    <motion.div
+      whileHover={{
+        y: -8,
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      }}
+      className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border ${
+        featured ? "border-primary" : "dark:border-gray-700"
+      } overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer`}
+      onClick={onClick}
+    >
+      <div className="h-40 bg-gray-100 dark:bg-gray-800 relative">
+        <img src="/placeholder.svg?height=160&width=400" alt="Job" className="w-full h-full object-cover" />
+        {featured && (
+          <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded text-xs font-bold">
+            Featured
+          </div>
+        )}
+      </div>
+
+      <div className="p-6">
+        <h3 className="font-bold text-lg mb-2">{title}</h3>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {skills.map((skill, index) => (
+            <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              {skill}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="flex items-center">
+            <Clock size={14} className="mr-1" />
+            <span>{duration}</span>
+          </div>
+          <div className="flex items-center">
+            <DollarSign size={14} className="mr-1" />
+            <span>{budget}</span>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+          <span className="text-sm font-medium">{company}</span>
+          <button className="btn-outline text-sm py-1 px-3">Apply</button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// Freelancer Card Component
+function FreelancerCard({ name, title, rating, hourlyRate, skills, onClick }) {
+  return (
+    <motion.div
+      whileHover={{
+        y: -8,
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      }}
+      className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="flex items-start gap-4">
+        <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+          <img src="/placeholder.svg?height=64&width=64" alt="Freelancer" className="w-full h-full object-cover" />
+        </div>
+
+        <div className="flex-grow">
+          <h3 className="font-bold text-lg">{name}</h3>
+          <p className="text-primary font-medium">{title}</p>
+
+          <div className="flex items-center mt-1 mb-2">
+            <div className="flex items-center text-yellow-500 mr-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={16} fill="currentColor" className={i < Math.floor(rating) ? "" : "opacity-50"} />
+              ))}
+            </div>
+            <span className="text-sm text-gray-500 dark:text-gray-400">({rating})</span>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-3">
+            {skills.map((skill, index) => (
+              <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="font-bold text-lg">${hourlyRate}</span>
+            <span className="text-gray-500 dark:text-gray-400 text-sm">/hr</span>
+          </div>
+          <button className="btn-outline text-sm py-1 px-3">View Profile</button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// Proposal Item Component
+function ProposalItem({ title, votes, daysLeft, votingPower }) {
+  return (
+    <div className="border-b border-gray-100 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
+      <div className="flex justify-between mb-1">
+        <h4 className="font-medium">{title}</h4>
+        <span className="text-sm text-primary">{daysLeft} days left</span>
+      </div>
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-1">
+        <div className="bg-primary h-2 rounded-full" style={{ width: `${votes.for}%` }}></div>
+      </div>
+      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+        <span>For: {votes.for}%</span>
+        <span>Against: {votes.against}%</span>
+      </div>
+      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">Your voting power: {votingPower} tokens</div>
+    </div>
+  )
+}
+
+// Stat Card Component
+function StatCard({ number, label, icon, prefix = "" }) {
+  const formattedNumber =
+    number >= 1000000 ? `${(number / 1000000).toFixed(1)}M` : number >= 1000 ? `${(number / 1000).toFixed(1)}K` : number
+
+  return (
+    <div className="text-white">
+      <div className="flex justify-center mb-4">{icon}</div>
+      <div className="text-3xl md:text-4xl font-bold mb-1">
+        {prefix}
+        {formattedNumber}
+      </div>
+      <p className="text-white/80">{label}</p>
+    </div>
+  )
+}
+
+// Clock icon component (missing from lucide-react import)
+function Clock({ size = 24, className = "" }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <polyline points="12 6 12 12 16 14"></polyline>
+    </svg>
   )
 }
 
@@ -285,7 +502,7 @@ export default function Home() {
                         y: -2,
                       }}
                       whileTap={{ scale: 0.95 }}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      className={`category-option px-4 py-2 rounded-full text-sm font-medium transition-all ${
                         category === cat.id
                           ? "bg-white text-primary shadow-lg"
                           : "bg-white/10 text-white hover:bg-white/20"
@@ -302,14 +519,14 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="bg-white rounded-lg shadow-xl p-2 flex flex-col md:flex-row"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-2 flex flex-col md:flex-row"
               >
                 <div className="flex-grow relative mb-2 md:mb-0">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                   <input
                     type="text"
                     placeholder={`Search for ${category} experts...`}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
                 </div>
                 <motion.button
@@ -354,82 +571,27 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* Hero Image/Illustration */}
+            {/* Hero Illustration */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               className="hidden md:block"
             >
-              <div className="relative">
+              <div className="hero-illustration">
+                <div className="hero-illustration-bg"></div>
                 <motion.div
-                  animate={{ rotate: [0, 3, 0, -3, 0] }}
-                  transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY }}
-                  className="absolute inset-0 bg-gradient-to-tr from-primary-light/20 to-accent/20 rounded-xl"
-                />
-                <motion.div
-                  whileHover={{
-                    y: -8,
-                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                    transition: { type: "spring", stiffness: 300, damping: 15 },
-                  }}
-                  className="glass-card rounded-xl p-6 relative z-10"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  className="relative w-full h-full"
                 >
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Code size={24} className="text-primary" />
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="font-bold text-gray-900">Smart Contract Developer</h3>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Star size={14} fill="currentColor" className="text-yellow-500 mr-1" />
-                          <span>4.9 (120 reviews)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Available</span>
-                  </div>
-
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center text-sm">
-                      <Cpu className="w-4 h-4 mr-2 text-primary" />
-                      <span>Solana, Rust, Smart Contracts</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Globe className="w-4 h-4 mr-2 text-primary" />
-                      <span>5 years of Web3 experience</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Zap className="w-4 h-4 mr-2 text-primary" />
-                      <span>$85/hr • 40+ hrs/week</span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <div className="flex -space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
-                        JD
-                      </div>
-                      <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                        AR
-                      </div>
-                      <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">
-                        TK
-                      </div>
-                    </div>
-                    <motion.button
-                      whileHover={{
-                        scale: 1.05,
-                        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-gradient-to-r from-accent to-accent-light text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
-                      onClick={() => setIsContactModalOpen(true)}
-                    >
-                      View Profile
-                    </motion.button>
-                  </div>
+                  <Image
+                    src="/hero-illustration.svg"
+                    alt="FreeLance DAO Illustration"
+                    width={600}
+                    height={400}
+                    className="w-full h-auto"
+                  />
                 </motion.div>
               </div>
             </motion.div>
@@ -442,6 +604,7 @@ export default function Home() {
             <path
               d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"
               fill="white"
+              className="dark:fill-gray-900"
             ></path>
           </svg>
         </div>
@@ -455,31 +618,31 @@ export default function Home() {
             <div className="flex items-center gap-16 px-4">
               <motion.div
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+                className="h-12 w-32 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700"
               >
                 <Image src="/logo.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
               <motion.div
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+                className="h-12 w-32 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700"
               >
                 <Image src="/web3-icon.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
               <motion.div
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+                className="h-12 w-32 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700"
               >
                 <Image src="/nft-icon.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
               <motion.div
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+                className="h-12 w-32 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700"
               >
                 <Image src="/defi-icon.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
               <motion.div
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-                className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
+                className="h-12 w-32 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700"
               >
                 <Image src="/dao-icon.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
@@ -621,7 +784,7 @@ export default function Home() {
               <div className="flex flex-col items-center text-center">
                 <motion.div
                   whileHover={{ y: -5, scale: 1.05 }}
-                  className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6"
+                  className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center text-primary mb-6"
                 >
                   <Users size={28} />
                 </motion.div>
@@ -636,7 +799,7 @@ export default function Home() {
               <div className="flex flex-col items-center text-center">
                 <motion.div
                   whileHover={{ y: -5, scale: 1.05 }}
-                  className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6"
+                  className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center text-primary mb-6"
                 >
                   <Shield size={28} />
                 </motion.div>
@@ -651,7 +814,7 @@ export default function Home() {
               <div className="flex flex-col items-center text-center">
                 <motion.div
                   whileHover={{ y: -5, scale: 1.05 }}
-                  className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6"
+                  className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center text-primary mb-6"
                 >
                   <Award size={28} />
                 </motion.div>
@@ -754,10 +917,12 @@ export default function Home() {
                   transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY }}
                   className="absolute inset-0 bg-gradient-to-tr from-primary-light/20 to-accent/20 rounded-xl"
                 />
-                <div className="bg-white rounded-xl shadow-lg p-6 relative z-10">
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 relative z-10">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="font-bold text-lg">Active Proposals</h3>
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">3 Active</span>
+                    <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full">
+                      3 Active
+                    </span>
                   </div>
 
                   <div className="space-y-4">
@@ -781,7 +946,7 @@ export default function Home() {
                     />
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-gray-100">
+                  <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <Link
                       href="/governance"
                       onClick={(e) => {
@@ -800,39 +965,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-gradient-to-r from-primary to-primary-light text-white relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            animate={{
-              x: [0, 20, 0],
-              opacity: [0.1, 0.2, 0.1],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Number.POSITIVE_INFINITY,
-              repeatType: "reverse",
-            }}
-            className="absolute top-20 -right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              x: [0, -20, 0],
-              opacity: [0.1, 0.15, 0.1],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Number.POSITIVE_INFINITY,
-              repeatType: "reverse",
-              delay: 1,
-            }}
-            className="absolute -bottom-20 -left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl"
-          />
-        </div>
-
+      <section className="py-16 px-4 stats-section relative overflow-hidden">
         <div className="container relative z-10">
           <FadeInWhenVisible direction="up">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">Growing fast with our community</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">Growing fast with our community</h2>
               <p className="text-white/80 max-w-2xl mx-auto">
                 Join thousands of freelancers and clients already using FreeLance DAO to revolutionize how work gets
                 done in web3.
@@ -843,22 +980,27 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <FadeInWhenVisible delay={0.1} direction="up">
               <div className="stat-card">
-                <StatCard number={1234} label="Jobs Posted" icon={<Briefcase size={24} />} />
+                <StatCard number={1234} label="Jobs Posted" icon={<Briefcase size={24} className="text-white" />} />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.2} direction="up">
               <div className="stat-card">
-                <StatCard number={2500000} label="Total Payouts" icon={<DollarSign size={24} />} prefix="$" />
+                <StatCard
+                  number={2500000}
+                  label="Total Payouts"
+                  icon={<DollarSign size={24} className="text-white" />}
+                  prefix="$"
+                />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3} direction="up">
               <div className="stat-card">
-                <StatCard number={5678} label="Active Users" icon={<Users size={24} />} />
+                <StatCard number={5678} label="Active Users" icon={<Users size={24} className="text-white" />} />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.4} direction="up">
               <div className="stat-card">
-                <StatCard number={890} label="DAO Members" icon={<Award size={24} />} />
+                <StatCard number={890} label="DAO Members" icon={<Award size={24} className="text-white" />} />
               </div>
             </FadeInWhenVisible>
           </div>
@@ -925,7 +1067,7 @@ export default function Home() {
             <label className="block text-sm font-medium mb-1">Email or Username</label>
             <input
               type="text"
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Enter your email or username"
             />
           </div>
@@ -933,7 +1075,7 @@ export default function Home() {
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               type="password"
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Enter your password"
             />
           </div>
@@ -950,7 +1092,7 @@ export default function Home() {
             Log In
           </button>
           <div className="text-center text-sm">
-            <span className="text-gray-500">Don't have an account?</span>{" "}
+            <span className="text-gray-500 dark:text-gray-400">Don't have an account?</span>{" "}
             <button
               className="text-primary hover:underline"
               onClick={() => {
@@ -963,14 +1105,14 @@ export default function Home() {
           </div>
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
+            <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M12 0C5.373 0 0 5.373 0 12C0 17.302 3.438 21.8 8.207 23.387C8.806 23.498 9 23.126 9 22.81V20.576C5.662 21.302 4.967 19.16 4.967 19.16C4.421 17.773 3.634 17.404 3.634 17.404C2.545 16.659 3.717 16.675 3.717 16.675C4.922 16.759 5.556 17.912 5.556 17.912C6.626 19.746 8.363 19.216 9.048 18.909C9.155 18.134 9.466 17.604 9.81 17.305C7.145 17 4.343 15.971 4.343 11.374C4.343 10.063 4.812 8.993 5.579 8.153C5.455 7.85 5.044 6.629 5.696 4.977C5.696 4.977 6.704 4.655 8.997 6.207C9.954 5.941 10.98 5.808 12 5.803C13.02 5.808 14.047 5.941 15.006 6.207C17.297 4.655 18.303 4.977 18.303 4.977C18.956 6.63 18.545 7.851 18.421 8.153C19.191 8.993 19.656 10.064 19.656 11.374C19.656 15.983 16.849 16.998 14.177 17.295C14.607 17.667 15 18.397 15 19.517V22.81C15 23.129 15.192 23.504 15.801 23.386C20.566 21.797 24 17.3 24 12C24 5.373 18.627 0 12 0Z"
@@ -979,7 +1121,7 @@ export default function Home() {
               </svg>
               <span>GitHub</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
+            <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.79 15.71 17.57V20.34H19.28C21.36 18.42 22.56 15.6 22.56 12.25Z"
@@ -1011,7 +1153,7 @@ export default function Home() {
               <label className="block text-sm font-medium mb-1">First Name</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="First name"
               />
             </div>
@@ -1019,7 +1161,7 @@ export default function Home() {
               <label className="block text-sm font-medium mb-1">Last Name</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="Last name"
               />
             </div>
@@ -1028,7 +1170,7 @@ export default function Home() {
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Enter your email"
             />
           </div>
@@ -1036,18 +1178,18 @@ export default function Home() {
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               type="password"
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Create a password"
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">I want to...</label>
             <div className="grid grid-cols-2 gap-4">
-              <button className="p-3 border rounded-lg hover:bg-gray-50 flex flex-col items-center">
+              <button className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600 flex flex-col items-center">
                 <Briefcase className="mb-2 text-primary" />
                 <span className="font-medium">Hire for a project</span>
               </button>
-              <button className="p-3 border rounded-lg hover:bg-gray-50 flex flex-col items-center">
+              <button className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600 flex flex-col items-center">
                 <Users className="mb-2 text-primary" />
                 <span className="font-medium">Work as a freelancer</span>
               </button>
@@ -1055,7 +1197,7 @@ export default function Home() {
           </div>
           <div className="flex items-start">
             <input type="checkbox" className="mt-1 mr-2" />
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               I agree to the{" "}
               <a href="#" className="text-primary hover:underline">
                 Terms of Service
@@ -1070,7 +1212,7 @@ export default function Home() {
             Create Account
           </button>
           <div className="text-center text-sm">
-            <span className="text-gray-500">Already have an account?</span>{" "}
+            <span className="text-gray-500 dark:text-gray-400">Already have an account?</span>{" "}
             <button
               className="text-primary hover:underline"
               onClick={() => {
@@ -1085,380 +1227,90 @@ export default function Home() {
       </Modal>
 
       <Modal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} title="Contact Freelancer">
-        <div className="flex items-center gap-4 mb-4 pb-4 border-b">
-          <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
-            <img src="/placeholder.svg" alt="Freelancer" className="w-full h-full object-cover" />
+        <div className="flex items-center gap-4 mb-4 pb-4 border-b dark:border-gray-700">
+          <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <img src="/placeholder.svg?height=64&width=64" alt="Freelancer" className="w-full h-full object-cover" />
           </div>
+
           <div>
-            <h3 className="font-bold text-lg">Alex Johnson</h3>
-            <p className="text-primary">Smart Contract Developer</p>
-            <div className="flex items-center text-sm text-gray-500">
-              <Star size={14} fill="currentColor" className="text-yellow-500 mr-1" />
-              <span>4.9 (120 reviews)</span>
-            </div>
+            <h4 className="font-bold">Alex Johnson</h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Smart Contract Developer</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Project Title</label>
+            <label className="block text-sm font-medium mb-1">Your Name</label>
             <input
               type="text"
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="e.g., Smart Contract Development for NFT Project"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Enter your name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Your Email</label>
+            <input
+              type="email"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Enter your email"
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Message</label>
             <textarea
-              rows={4}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Describe your project and requirements..."
+              rows="4"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Write your message"
             ></textarea>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Budget</label>
-            <div className="flex items-center">
-              <span className="bg-gray-100 p-2 rounded-l-lg border-y border-l">$</span>
-              <input
-                type="number"
-                className="w-full p-2 border-y border-r rounded-r-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Enter your budget"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Timeline</label>
-            <select className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="">Select timeline</option>
-              <option value="less-than-week">Less than 1 week</option>
-              <option value="1-2-weeks">1-2 weeks</option>
-              <option value="2-4-weeks">2-4 weeks</option>
-              <option value="1-3-months">1-3 months</option>
-              <option value="3-6-months">3-6 months</option>
-            </select>
-          </div>
-          <button className="w-full bg-gradient-to-r from-primary to-primary-light text-white font-bold py-2 px-4 rounded-lg">
+          <button className="w-full bg-gradient-to-r from-accent to-accent-light text-white font-bold py-2 px-4 rounded-lg">
             Send Message
           </button>
         </div>
       </Modal>
 
-      <Modal
-        isOpen={isJobModalOpen}
-        onClose={() => setIsJobModalOpen(false)}
-        title={selectedCategory ? `Browse ${selectedCategory.label} Jobs` : "Browse Jobs"}
-      >
+      <Modal isOpen={isJobModalOpen} onClose={() => setIsJobModalOpen(false)} title="Find Web3 Talent">
         <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <div>
+            <label className="block text-sm font-medium mb-1">Job Title</label>
             <input
               type="text"
-              placeholder="Search for jobs..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Enter job title"
             />
           </div>
-
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="text-xs bg-gray-100 px-2 py-1 rounded flex items-center">
-              Solana <X size={14} className="ml-1 cursor-pointer" />
-            </span>
-            <span className="text-xs bg-gray-100 px-2 py-1 rounded flex items-center">
-              Smart Contracts <X size={14} className="ml-1 cursor-pointer" />
-            </span>
-            <span className="text-xs bg-gray-100 px-2 py-1 rounded flex items-center">
-              Remote <X size={14} className="ml-1 cursor-pointer" />
-            </span>
+          <div>
+            <label className="block text-sm font-medium mb-1">Category</label>
+            <select className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option>Web3 Development</option>
+              <option>Blockchain</option>
+              <option>Smart Contracts</option>
+              <option>NFT & Digital Art</option>
+              <option>DeFi</option>
+              <option>DAO Management</option>
+            </select>
           </div>
-
-          <div className="space-y-4 max-h-[400px] overflow-y-auto">
-            <div className="border rounded-lg p-4 hover:border-primary cursor-pointer transition-colors">
-              <div className="flex justify-between">
-                <h3 className="font-bold">Solana Smart Contract Developer</h3>
-                <span className="text-sm text-green-600 font-medium">$50-75/hr</span>
-              </div>
-              <p className="text-sm text-gray-600 mt-1 mb-2">
-                Looking for an experienced Solana developer to build a DeFi protocol...
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">Solana</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">Rust</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">DeFi</span>
-              </div>
-            </div>
-
-            <div className="border rounded-lg p-4 hover:border-primary cursor-pointer transition-colors">
-              <div className="flex justify-between">
-                <h3 className="font-bold">NFT Collection Smart Contract</h3>
-                <span className="text-sm text-green-600 font-medium">$2,000-3,000</span>
-              </div>
-              <p className="text-sm text-gray-600 mt-1 mb-2">
-                Need a developer to create an NFT collection with custom minting logic...
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">NFT</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">Solana</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">Rust</span>
-              </div>
-            </div>
-
-            <div className="border rounded-lg p-4 hover:border-primary cursor-pointer transition-colors">
-              <div className="flex justify-between">
-                <h3 className="font-bold">Web3 Frontend Developer</h3>
-                <span className="text-sm text-green-600 font-medium">$40-60/hr</span>
-              </div>
-              <p className="text-sm text-gray-600 mt-1 mb-2">
-                Looking for a React developer with experience in Web3 integrations...
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">React</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">Web3.js</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">TypeScript</span>
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Skills</label>
+            <input
+              type="text"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Enter required skills (e.g., React, Solidity)"
+            />
           </div>
-
-          <div className="flex justify-between pt-4 border-t">
-            <button className="text-primary hover:underline flex items-center">
-              <Check size={16} className="mr-1" /> Save search
-            </button>
-            <button className="bg-gradient-to-r from-primary to-primary-light text-white font-bold py-2 px-4 rounded-lg">
-              Post a Similar Job
-            </button>
+          <div>
+            <label className="block text-sm font-medium mb-1">Budget</label>
+            <input
+              type="number"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Enter your budget"
+            />
           </div>
+          <button className="w-full bg-gradient-to-r from-primary to-primary-light text-white font-bold py-2 px-4 rounded-lg">
+            Post Job
+          </button>
         </div>
       </Modal>
     </div>
-  )
-}
-
-// Category Card Component
-function CategoryCard({ title, description, icon, skills, onClick }) {
-  return (
-    <motion.div
-      whileHover={{
-        y: -8,
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-      }}
-      className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="text-primary mb-4">{icon}</div>
-      <h3 className="font-bold text-lg mb-1">{title}</h3>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{description}</p>
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        {skills.map((skill, index) => (
-          <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-            {skill}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 text-primary font-medium text-sm flex items-center group">
-        Browse
-        <ChevronRight size={14} className="ml-1 transition-transform group-hover:translate-x-1" />
-      </div>
-    </motion.div>
-  )
-}
-
-// Freelancer Card Component
-function FreelancerCard({ name, title, rating, hourlyRate, skills, onClick }) {
-  return (
-    <motion.div
-      whileHover={{
-        y: -8,
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-      }}
-      className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 overflow-hidden transition-all duration-300 cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
-            <img src="/placeholder.svg" alt={name} className="w-full h-full object-cover" />
-          </div>
-
-          <div className="flex-grow">
-            <h3 className="font-bold text-lg">{name}</h3>
-            <p className="text-primary font-medium">{title}</p>
-
-            <div className="flex items-center mt-1 mb-2">
-              <div className="flex items-center text-yellow-500 mr-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} fill="currentColor" className={i >= Math.floor(rating) ? "opacity-50" : ""} />
-                ))}
-              </div>
-              <span className="text-sm text-gray-500">({rating})</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mt-3">
-          {skills.map((skill, index) => (
-            <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-              {skill}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-between items-center">
-        <div>
-          <span className="font-bold text-lg">${hourlyRate}</span>
-          <span className="text-gray-500 text-sm">/hr</span>
-        </div>
-        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="btn-outline text-sm py-1">
-          View Profile
-        </motion.button>
-      </div>
-    </motion.div>
-  )
-}
-
-// Job Card Component
-function JobCard({ title, budget, duration, skills, company, featured, onClick }) {
-  return (
-    <motion.div
-      whileHover={{
-        y: -8,
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-      }}
-      className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer ${
-        featured ? "border-accent" : ""
-      }`}
-      onClick={onClick}
-    >
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="font-bold text-lg">{title}</h3>
-          {featured && (
-            <span className="bg-accent/10 text-accent text-xs px-2 py-1 rounded-full font-medium">Featured</span>
-          )}
-        </div>
-
-        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-          Looking for an experienced developer to join our team and help build cutting-edge web3 applications.
-        </p>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          {skills.map((skill, index) => (
-            <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-              {skill}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex justify-between items-center text-sm text-gray-500">
-          <div className="flex items-center">
-            <DollarSign size={14} className="mr-1" />
-            <span>{budget}</span>
-          </div>
-          <div className="flex items-center">
-            <Clock size={14} className="mr-1" />
-            <span>{duration}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-            <img src="/placeholder.svg" alt={company} className="w-full h-full object-cover" />
-          </div>
-          <span className="text-sm font-medium">{company}</span>
-        </div>
-        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="btn-outline text-sm py-1">
-          Apply
-        </motion.button>
-      </div>
-    </motion.div>
-  )
-}
-
-// Proposal Item Component
-function ProposalItem({ title, votes, daysLeft, votingPower }) {
-  return (
-    <div className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-      <div className="flex justify-between mb-1">
-        <span className="font-medium">{title}</span>
-        <span className="text-sm text-orange-500">{daysLeft} days left</span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-        <div className="bg-primary h-2.5 rounded-full" style={{ width: `${votes.for}%` }}></div>
-      </div>
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>For: {votes.for}%</span>
-        <span>Against: {votes.against}%</span>
-      </div>
-      <div className="mt-2 text-xs text-gray-500">Your voting power: {votingPower} tokens</div>
-    </div>
-  )
-}
-
-// Stat Card Component
-function StatCard({ number, label, icon, prefix = "" }) {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    let start = 0
-    const end = Number.parseInt(number.toString().replace(/,/g, ""))
-    const duration = 2000
-    const increment = end / (duration / 16) // 60fps
-
-    if (start < end) {
-      const timer = setInterval(() => {
-        start += increment
-        if (start > end) start = end
-        setCount(Math.floor(start))
-        if (start === end) clearInterval(timer)
-      }, 16)
-
-      return () => clearInterval(timer)
-    }
-  }, [number])
-
-  const formatNumber = (num) => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + "M+"
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + "K+"
-    }
-    return num.toString() + "+"
-  }
-
-  return (
-    <div className="animate-fade-in">
-      <div className="flex justify-center mb-2">{icon}</div>
-      <div className="text-2xl md:text-3xl font-bold">
-        {prefix}
-        {formatNumber(count)}
-      </div>
-      <div className="text-sm opacity-80">{label}</div>
-    </div>
-  )
-}
-
-// FileCode icon component since it wasn't imported
-function FileCode({ size = 24, className }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
-      <path d="m10 13-2 2 2 2" />
-      <path d="m14 17 2-2-2-2" />
-    </svg>
   )
 }

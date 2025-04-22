@@ -11,17 +11,21 @@ export const useTheme = () => useContext(ThemeContext)
 
 export default function ThemeProvider({ children }) {
   const [theme, setTheme] = useState("light")
+  const [mounted, setMounted] = useState(false)
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme from localStorage or default to light
   useEffect(() => {
+    setMounted(true)
     const storedTheme = localStorage.getItem("theme")
 
     if (storedTheme) {
       setTheme(storedTheme)
       document.documentElement.classList.toggle("dark", storedTheme === "dark")
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark")
-      document.documentElement.classList.add("dark")
+    } else {
+      // Default to light theme
+      setTheme("light")
+      localStorage.setItem("theme", "light")
+      document.documentElement.classList.remove("dark")
     }
   }, [])
 
@@ -31,6 +35,9 @@ export default function ThemeProvider({ children }) {
     localStorage.setItem("theme", newTheme)
     document.documentElement.classList.toggle("dark", newTheme === "dark")
   }
+
+  // Avoid hydration mismatch
+  if (!mounted) return <>{children}</>
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
 }

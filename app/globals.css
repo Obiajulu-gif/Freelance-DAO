@@ -25,30 +25,34 @@
 }
 
 .dark {
-  --background: 15, 23, 42; /* #0f172a */
+  --background: 17, 24, 39; /* #111827 - darker for better contrast */
   --foreground: 248, 250, 252; /* #f8fafc */
-  --card: 30, 41, 59; /* #1e293b */
+  --card: 31, 41, 55; /* #1f2937 - richer dark */
   --card-foreground: 248, 250, 252; /* #f8fafc */
-  --popover: 30, 41, 59; /* #1e293b */
+  --popover: 31, 41, 55; /* #1f2937 */
   --popover-foreground: 248, 250, 252; /* #f8fafc */
-  --primary: 26, 44, 255; /* #1a2cff - slightly lighter in dark mode */
-  --primary-foreground: 255, 255, 255; /* white */
+  --primary: 59, 130, 246; /* #3b82f6 - brighter blue in dark mode */
+  --primary-light: 96, 165, 250; /* #60a5fa */
+  --primary-dark: 37, 99, 235; /* #2563eb */
   --secondary: 51, 65, 85; /* #334155 */
   --secondary-foreground: 248, 250, 252; /* #f8fafc */
   --muted: 51, 65, 85; /* #334155 */
   --muted-foreground: 148, 163, 184; /* #94a3b8 */
-  --accent: 0, 200, 83; /* #00c853 - keep the same */
+  --accent: 16, 185, 129; /* #10b981 - slightly different green for dark mode */
+  --accent-light: 52, 211, 153; /* #34d399 */
+  --accent-dark: 5, 150, 105; /* #059669 */
   --accent-foreground: 255, 255, 255; /* white */
   --destructive: 239, 68, 68; /* #ef4444 */
   --destructive-foreground: 248, 250, 252; /* #f8fafc */
-  --border: 51, 65, 85; /* #334155 */
-  --input: 51, 65, 85; /* #334155 */
-  --ring: 26, 44, 255; /* #1a2cff */
+  --border: 55, 65, 81; /* #374151 - slightly lighter */
+  --input: 55, 65, 81; /* #374151 */
+  --ring: 59, 130, 246; /* #3b82f6 */
 }
 
 body {
   color: rgb(var(--foreground));
   background: rgb(var(--background));
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .wave-bg {
@@ -252,15 +256,16 @@ body {
 /* Growing community section enhancement */
 .stat-card {
   @apply relative overflow-hidden rounded-lg p-6 transition-all duration-300;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .stat-card::before {
@@ -270,7 +275,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transform: translateX(-100%);
 }
 
@@ -299,6 +304,94 @@ body {
 .get-started-btn:hover::after {
   transform: translateX(100%);
   transition: transform 0.6s ease;
+}
+
+/* Category option hover effect */
+.category-option {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.category-option::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+}
+
+.category-option:hover::after {
+  transform: translateX(100%);
+  transition: transform 0.6s ease;
+}
+
+.category-option:active {
+  transform: scale(0.95);
+}
+
+/* Stats section in light mode */
+.stats-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(var(--primary), 0.95), rgba(var(--primary-light), 0.95));
+  z-index: -1;
+}
+
+.dark .glass-card {
+  background: rgba(31, 41, 55, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-card:hover {
+  background: rgba(31, 41, 55, 0.8);
+}
+
+.dark .stat-card {
+  background: rgba(31, 41, 55, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .stat-card:hover {
+  background: rgba(31, 41, 55, 0.4);
+}
+
+/* Dark mode text gradient */
+.dark .text-gradient {
+  background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent-light)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hero illustration container */
+.hero-illustration {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-illustration-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(var(--primary-light), 0.2), transparent 70%);
+  border-radius: 30px;
+  z-index: -1;
 }
 
 @layer components {
@@ -333,29 +426,4 @@ body {
   .section-subtitle {
     @apply text-xl md:text-2xl font-semibold mb-4;
   }
-}
-
-.dark .glass-card {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .glass-card:hover {
-  background: rgba(30, 41, 59, 0.8);
-}
-
-.dark .stat-card {
-  background: rgba(30, 41, 59, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .stat-card:hover {
-  background: rgba(30, 41, 59, 0.4);
-}
-
-/* Dark mode text gradient */
-.dark .text-gradient {
-  background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent-light)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
