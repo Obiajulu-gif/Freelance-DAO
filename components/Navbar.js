@@ -20,6 +20,9 @@ import {
   Globe,
 } from "lucide-react"
 
+// Import the ThemeToggle component at the top of the file
+import ThemeToggle from "./ThemeToggle"
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -59,7 +62,7 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+          isScrolled ? "bg-white dark:bg-gray-900 shadow-md py-2" : "bg-transparent py-4"
         }`}
       >
         <div className="container mx-auto px-4">
@@ -145,21 +148,25 @@ export default function Navbar() {
             {/* Desktop Right Side */}
             <div className="hidden md:flex items-center space-x-2">
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 relative ${isScrolled ? "text-gray-700" : "text-white"}`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               >
                 <Search size={20} />
               </button>
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 relative ${isScrolled ? "text-gray-700" : "text-white"}`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               >
                 <Bell size={20} />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 relative ${isScrolled ? "text-gray-700" : "text-white"}`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               >
                 <MessageSquare size={20} />
               </button>
+
+              <ThemeToggle
+                className={`hover:bg-gray-100 dark:hover:bg-gray-800 ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+              />
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -235,6 +242,11 @@ export default function Navbar() {
                   <Vote size={20} className="mr-3 text-primary" />
                   <span>DAO Governance</span>
                 </Link>
+
+                <div className="flex items-center justify-between py-3 px-4 border-t border-gray-200 dark:border-gray-700">
+                  <span className="text-sm">Toggle theme</span>
+                  <ThemeToggle />
+                </div>
 
                 <div className="pt-2 border-t border-gray-200">
                   <button className="w-full bg-gradient-to-r from-accent to-accent-light text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg">

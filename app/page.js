@@ -67,7 +67,7 @@ const Marquee = ({ children, speed = 30 }) => {
 }
 
 // Animation for sections
-const FadeInWhenVisible = ({ children, delay = 0 }) => {
+const FadeInWhenVisible = ({ children, delay = 0, direction = null }) => {
   const controls = useAnimation()
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -80,17 +80,26 @@ const FadeInWhenVisible = ({ children, delay = 0 }) => {
     }
   }, [controls, inView])
 
+  const variants = {
+    hidden: {
+      opacity: 0,
+      y: direction === "up" ? 30 : direction === "down" ? -30 : 0,
+      x: direction === "left" ? 30 : direction === "right" ? -30 : 0,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      x: 0,
+      transition: {
+        duration: 0.6,
+        delay,
+        ease: "easeOut",
+      },
+    },
+  }
+
   return (
-    <motion.div
-      ref={ref}
-      animate={controls}
-      initial="hidden"
-      transition={{ duration: 0.5, delay }}
-      variants={{
-        visible: { opacity: 1, y: 0 },
-        hidden: { opacity: 0, y: 30 },
-      }}
-    >
+    <motion.div ref={ref} animate={controls} initial="hidden" variants={variants}>
       {children}
     </motion.div>
   )
@@ -115,16 +124,48 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100])
 
   const categories = [
-    { id: "web3", label: "Web3 Development", icon: <Code size={24} /> },
-    { id: "blockchain", label: "Blockchain", icon: <Cpu size={24} /> },
-    { id: "smart-contracts", label: "Smart Contracts", icon: <FileCode size={24} /> },
+    {
+      id: "web3",
+      label: "Web3 Development",
+      icon: <Code size={24} />,
+      description: "1,234+ freelancers",
+      skills: ["React", "Next.js", "Web3.js", "ethers.js"],
+    },
+    {
+      id: "blockchain",
+      label: "Blockchain",
+      icon: <Image src="/blockchain-icon.svg" width={24} height={24} alt="Blockchain Icon" />,
+      description: "876+ freelancers",
+      skills: ["Consensus", "Tokenomics", "Security", "Architecture"],
+    },
+    {
+      id: "smart-contracts",
+      label: "Smart Contracts",
+      icon: <Image src="/smart-contract-icon.svg" width={24} height={24} alt="Smart Contract Icon" />,
+      description: "543+ freelancers",
+      skills: ["Solidity", "Rust", "Auditing", "Security"],
+    },
     {
       id: "nft",
       label: "NFT & Digital Art",
       icon: <Image src="/nft-icon.svg" width={24} height={24} alt="NFT Icon" />,
+      description: "987+ freelancers",
+      skills: ["Illustration", "3D Modeling", "Animation", "Minting"],
     },
-    { id: "defi", label: "DeFi", icon: <DollarSign size={24} /> },
-    { id: "dao", label: "DAO Management", icon: <Users size={24} /> },
+    {
+      id: "defi",
+      label: "DeFi",
+      icon: <Image src="/defi-icon.svg" width={24} height={24} alt="DeFi Icon" />,
+      description: "432+ freelancers",
+      skills: ["Lending", "DEX", "Yield Farming", "Staking"],
+    },
+    {
+      id: "dao",
+      label: "DAO Management",
+      icon: <Image src="/dao-icon.svg" width={24} height={24} alt="DAO Icon" />,
+      description: "321+ freelancers",
+      skills: ["Governance", "Treasury", "Community", "Voting"],
+    },
   ]
 
   const openCategoryModal = (category) => {
@@ -407,9 +448,9 @@ export default function Home() {
       </section>
 
       {/* Trusted Companies Section with Marquee */}
-      <section className="py-10 px-4 bg-white">
+      <section className="py-10 px-4 bg-white dark:bg-gray-900">
         <div className="container">
-          <p className="text-center text-gray-500 mb-6">Trusted by leading web3 companies</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-6">Trusted by leading web3 companies</p>
           <Marquee speed={30}>
             <div className="flex items-center gap-16 px-4">
               <motion.div
@@ -434,22 +475,22 @@ export default function Home() {
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
                 className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
               >
-                <Image src="/logo.svg" alt="Company Logo" width={80} height={30} />
+                <Image src="/defi-icon.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
               <motion.div
                 whileHover={{ y: -5, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
                 className="h-12 w-32 bg-gray-50 rounded-lg flex items-center justify-center text-xs text-gray-500 border border-gray-100"
               >
-                <Image src="/web3-icon.svg" alt="Company Logo" width={80} height={30} />
+                <Image src="/dao-icon.svg" alt="Company Logo" width={80} height={30} />
               </motion.div>
             </div>
           </Marquee>
         </div>
       </section>
 
-      <section className="section bg-gray-50">
+      <section className="section bg-gray-50 dark:bg-gray-800">
         <div className="container">
-          <FadeInWhenVisible>
+          <FadeInWhenVisible direction="up">
             <div className="flex flex-col md:flex-row justify-between items-center mb-10">
               <h2 className="section-title">Browse talent by category</h2>
               <Link href="/freelancers" className="flex items-center text-primary hover:text-primary-light font-medium">
@@ -460,12 +501,12 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((cat, index) => (
-              <FadeInWhenVisible key={cat.id} delay={index * 0.1}>
+              <FadeInWhenVisible key={cat.id} delay={index * 0.1} direction={index % 2 === 0 ? "left" : "right"}>
                 <CategoryCard
                   title={cat.label}
-                  description={`${Math.floor(Math.random() * 1000) + 500}+ freelancers`}
+                  description={cat.description}
                   icon={cat.icon}
-                  skills={["Solana", "Rust", "Ethereum", "Web3"]}
+                  skills={cat.skills}
                   onClick={() => openCategoryModal(cat)}
                 />
               </FadeInWhenVisible>
@@ -474,9 +515,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section bg-white">
+      <section className="section bg-white dark:bg-gray-900">
         <div className="container">
-          <FadeInWhenVisible>
+          <FadeInWhenVisible direction="up">
             <div className="flex flex-col md:flex-row justify-between items-center mb-10">
               <h2 className="section-title">Featured jobs</h2>
               <Link href="/jobs" className="flex items-center text-primary hover:text-primary-light font-medium">
@@ -486,7 +527,7 @@ export default function Home() {
           </FadeInWhenVisible>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FadeInWhenVisible delay={0.1}>
+            <FadeInWhenVisible delay={0.1} direction="up">
               <JobCard
                 title="Solana Smart Contract Developer"
                 budget="$2,000 - $3,500"
@@ -497,7 +538,7 @@ export default function Home() {
                 onClick={() => setIsJobModalOpen(true)}
               />
             </FadeInWhenVisible>
-            <FadeInWhenVisible delay={0.2}>
+            <FadeInWhenVisible delay={0.2} direction="up">
               <JobCard
                 title="Web3 Frontend Developer"
                 budget="$1,500 - $2,500"
@@ -508,7 +549,7 @@ export default function Home() {
                 onClick={() => setIsJobModalOpen(true)}
               />
             </FadeInWhenVisible>
-            <FadeInWhenVisible delay={0.3}>
+            <FadeInWhenVisible delay={0.3} direction="up">
               <JobCard
                 title="NFT Collection Designer"
                 budget="$3,000 - $5,000"
@@ -523,9 +564,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section bg-gray-50">
+      <section className="section bg-gray-50 dark:bg-gray-800">
         <div className="container">
-          <FadeInWhenVisible>
+          <FadeInWhenVisible direction="up">
             <div className="flex flex-col md:flex-row justify-between items-center mb-10">
               <h2 className="section-title">Top rated freelancers</h2>
               <Link href="/freelancers" className="flex items-center text-primary hover:text-primary-light font-medium">
@@ -535,7 +576,7 @@ export default function Home() {
           </FadeInWhenVisible>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FadeInWhenVisible delay={0.1}>
+            <FadeInWhenVisible delay={0.1} direction="up">
               <FreelancerCard
                 name="Alex Johnson"
                 title="Smart Contract Developer"
@@ -545,7 +586,7 @@ export default function Home() {
                 onClick={() => setIsContactModalOpen(true)}
               />
             </FadeInWhenVisible>
-            <FadeInWhenVisible delay={0.2}>
+            <FadeInWhenVisible delay={0.2} direction="up">
               <FreelancerCard
                 name="Sarah Williams"
                 title="Web3 Frontend Developer"
@@ -555,7 +596,7 @@ export default function Home() {
                 onClick={() => setIsContactModalOpen(true)}
               />
             </FadeInWhenVisible>
-            <FadeInWhenVisible delay={0.3}>
+            <FadeInWhenVisible delay={0.3} direction="up">
               <FreelancerCard
                 name="Michael Chen"
                 title="Blockchain Architect"
@@ -569,44 +610,53 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section bg-white">
+      <section className="section bg-white dark:bg-gray-900">
         <div className="container">
-          <FadeInWhenVisible>
+          <FadeInWhenVisible direction="up">
             <h2 className="section-title text-center mb-16">How FreeLance DAO works</h2>
           </FadeInWhenVisible>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <FadeInWhenVisible delay={0.1}>
+            <FadeInWhenVisible delay={0.1} direction="up">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.05 }}
+                  className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6"
+                >
                   <Users size={28} />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-bold mb-3">1. Post a job or find work</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Create your profile, connect your wallet, and start browsing jobs or posting your requirements.
                 </p>
               </div>
             </FadeInWhenVisible>
 
-            <FadeInWhenVisible delay={0.2}>
+            <FadeInWhenVisible delay={0.2} direction="up">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.05 }}
+                  className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6"
+                >
                   <Shield size={28} />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-bold mb-3">2. Collaborate securely</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Work together with smart contract escrow protection and on-chain reputation tracking.
                 </p>
               </div>
             </FadeInWhenVisible>
 
-            <FadeInWhenVisible delay={0.3}>
+            <FadeInWhenVisible delay={0.3} direction="up">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6">
+                <motion.div
+                  whileHover={{ y: -5, scale: 1.05 }}
+                  className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6"
+                >
                   <Award size={28} />
-                </div>
+                </motion.div>
                 <h3 className="text-xl font-bold mb-3">3. Get paid & build reputation</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Receive payment in crypto or fiat and grow your verifiable on-chain reputation.
                 </p>
               </div>
@@ -627,41 +677,54 @@ export default function Home() {
                   e.preventDefault()
                   setIsSignupModalOpen(true)
                 }}
-                className="btn-primary flex items-center bg-gradient-to-r from-accent to-accent-light px-6 py-3 rounded-full shadow-lg"
+                className="get-started-btn btn-primary flex items-center bg-gradient-to-r from-accent to-accent-light px-6 py-3 rounded-full shadow-lg"
               >
-                Get Started <ArrowRight size={16} className="ml-2" />
+                <span className="relative z-10">Get Started</span>{" "}
+                <ArrowRight size={16} className="ml-2 relative z-10" />
               </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="section bg-gray-50 overflow-hidden">
+      <section className="section bg-gray-50 dark:bg-gray-800 overflow-hidden">
         <div className="container">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <FadeInWhenVisible>
+            <FadeInWhenVisible direction="left">
               <div>
                 <span className="text-accent font-semibold mb-2 block">COMMUNITY OWNED</span>
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">
                   Shape the future of freelancing with DAO governance
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
                   Unlike traditional platforms, FreeLance DAO gives power back to the community. Vote on platform
                   decisions, fee structures, and new features using our governance token.
                 </p>
                 <ul className="space-y-4 mb-8">
-                  <li className="flex items-start">
+                  <motion.li
+                    className="flex items-start"
+                    whileHover={{ x: 5 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <CheckCircle size={20} className="text-accent mr-3 mt-1 flex-shrink-0" />
                     <span>Vote on platform upgrades and fee structures</span>
-                  </li>
-                  <li className="flex items-start">
+                  </motion.li>
+                  <motion.li
+                    className="flex items-start"
+                    whileHover={{ x: 5 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <CheckCircle size={20} className="text-accent mr-3 mt-1 flex-shrink-0" />
                     <span>Earn governance tokens by completing jobs</span>
-                  </li>
-                  <li className="flex items-start">
+                  </motion.li>
+                  <motion.li
+                    className="flex items-start"
+                    whileHover={{ x: 5 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
                     <CheckCircle size={20} className="text-accent mr-3 mt-1 flex-shrink-0" />
                     <span>Participate in community-funded bounties</span>
-                  </li>
+                  </motion.li>
                 </ul>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
@@ -678,7 +741,7 @@ export default function Home() {
               </div>
             </FadeInWhenVisible>
 
-            <FadeInWhenVisible delay={0.2}>
+            <FadeInWhenVisible delay={0.2} direction="right">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -739,71 +802,118 @@ export default function Home() {
 
       <section className="py-16 px-4 bg-gradient-to-r from-primary to-primary-light text-white relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 -right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl"></div>
+          <motion.div
+            animate={{
+              x: [0, 20, 0],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Number.POSITIVE_INFINITY,
+              repeatType: "reverse",
+            }}
+            className="absolute top-20 -right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              x: [0, -20, 0],
+              opacity: [0.1, 0.15, 0.1],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Number.POSITIVE_INFINITY,
+              repeatType: "reverse",
+              delay: 1,
+            }}
+            className="absolute -bottom-20 -left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl"
+          />
         </div>
 
         <div className="container relative z-10">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Growing fast with our community</h2>
-            <p className="text-white/80 max-w-2xl mx-auto">
-              Join thousands of freelancers and clients already using FreeLance DAO to revolutionize how work gets done
-              in web3.
-            </p>
-          </div>
+          <FadeInWhenVisible direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">Growing fast with our community</h2>
+              <p className="text-white/80 max-w-2xl mx-auto">
+                Join thousands of freelancers and clients already using FreeLance DAO to revolutionize how work gets
+                done in web3.
+              </p>
+            </div>
+          </FadeInWhenVisible>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <StatCard number={1234} label="Jobs Posted" icon={<Briefcase size={24} />} />
-            <StatCard number={2500000} label="Total Payouts" icon={<DollarSign size={24} />} prefix="$" />
-            <StatCard number={5678} label="Active Users" icon={<Users size={24} />} />
-            <StatCard number={890} label="DAO Members" icon={<Award size={24} />} />
+            <FadeInWhenVisible delay={0.1} direction="up">
+              <div className="stat-card">
+                <StatCard number={1234} label="Jobs Posted" icon={<Briefcase size={24} />} />
+              </div>
+            </FadeInWhenVisible>
+            <FadeInWhenVisible delay={0.2} direction="up">
+              <div className="stat-card">
+                <StatCard number={2500000} label="Total Payouts" icon={<DollarSign size={24} />} prefix="$" />
+              </div>
+            </FadeInWhenVisible>
+            <FadeInWhenVisible delay={0.3} direction="up">
+              <div className="stat-card">
+                <StatCard number={5678} label="Active Users" icon={<Users size={24} />} />
+              </div>
+            </FadeInWhenVisible>
+            <FadeInWhenVisible delay={0.4} direction="up">
+              <div className="stat-card">
+                <StatCard number={890} label="DAO Members" icon={<Award size={24} />} />
+              </div>
+            </FadeInWhenVisible>
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-white dark:bg-gray-900">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">Ready to get started with FreeLance DAO?</h2>
-          <p className="text-gray-600 mb-8 max-w-xl mx-auto">
-            Join the revolution in freelancing today and experience the power of decentralized work.
-          </p>
+          <FadeInWhenVisible direction="up">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">Ready to get started with FreeLance DAO?</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
+              Join the revolution in freelancing today and experience the power of decentralized work.
+            </p>
+          </FadeInWhenVisible>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.div
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link
-                href="/freelancers"
-                onClick={(e) => {
-                  e.preventDefault()
-                  setIsJobModalOpen(true)
+            <FadeInWhenVisible delay={0.1} direction="left">
+              <motion.div
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                 }}
-                className="btn-primary bg-gradient-to-r from-primary to-primary-light shadow-lg shadow-primary/20 px-6 py-3 rounded-full"
+                whileTap={{ scale: 0.95 }}
               >
-                Find Talent
-              </Link>
-            </motion.div>
-            <motion.div
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link
-                href="/register"
-                onClick={(e) => {
-                  e.preventDefault()
-                  setIsSignupModalOpen(true)
+                <Link
+                  href="/freelancers"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setIsJobModalOpen(true)
+                  }}
+                  className="btn-primary bg-gradient-to-r from-primary to-primary-light shadow-lg shadow-primary/20 px-6 py-3 rounded-full"
+                >
+                  Find Talent
+                </Link>
+              </motion.div>
+            </FadeInWhenVisible>
+            <FadeInWhenVisible delay={0.2} direction="right">
+              <motion.div
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                 }}
-                className="btn-secondary bg-gradient-to-r from-accent to-accent-light shadow-lg shadow-accent/20 px-6 py-3 rounded-full"
+                whileTap={{ scale: 0.95 }}
               >
-                Start Freelancing
-              </Link>
-            </motion.div>
+                <Link
+                  href="/register"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setIsSignupModalOpen(true)
+                  }}
+                  className="btn-secondary bg-gradient-to-r from-accent to-accent-light shadow-lg shadow-accent/20 px-6 py-3 rounded-full"
+                >
+                  Start Freelancing
+                </Link>
+              </motion.div>
+            </FadeInWhenVisible>
           </div>
         </div>
       </section>
@@ -1130,16 +1240,16 @@ function CategoryCard({ title, description, icon, skills, onClick }) {
         y: -8,
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
       }}
-      className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
+      className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
       onClick={onClick}
     >
       <div className="text-primary mb-4">{icon}</div>
       <h3 className="font-bold text-lg mb-1">{title}</h3>
-      <p className="text-gray-500 text-sm mb-4">{description}</p>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{description}</p>
 
       <div className="flex flex-wrap gap-2 mb-4">
         {skills.map((skill, index) => (
-          <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
+          <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
             {skill}
           </span>
         ))}
@@ -1161,7 +1271,7 @@ function FreelancerCard({ name, title, rating, hourlyRate, skills, onClick }) {
         y: -8,
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
       }}
-      className="bg-white rounded-xl shadow-sm border overflow-hidden transition-all duration-300 cursor-pointer"
+      className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 overflow-hidden transition-all duration-300 cursor-pointer"
       onClick={onClick}
     >
       <div className="p-6">
@@ -1187,14 +1297,14 @@ function FreelancerCard({ name, title, rating, hourlyRate, skills, onClick }) {
 
         <div className="flex flex-wrap gap-2 mt-3">
           {skills.map((skill, index) => (
-            <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
+            <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
               {skill}
             </span>
           ))}
         </div>
       </div>
 
-      <div className="bg-gray-50 p-4 flex justify-between items-center">
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-between items-center">
         <div>
           <span className="font-bold text-lg">${hourlyRate}</span>
           <span className="text-gray-500 text-sm">/hr</span>
@@ -1215,7 +1325,7 @@ function JobCard({ title, budget, duration, skills, company, featured, onClick }
         y: -8,
         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
       }}
-      className={`bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer ${
+      className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer ${
         featured ? "border-accent" : ""
       }`}
       onClick={onClick}
@@ -1228,13 +1338,13 @@ function JobCard({ title, budget, duration, skills, company, featured, onClick }
           )}
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
           Looking for an experienced developer to join our team and help build cutting-edge web3 applications.
         </p>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {skills.map((skill, index) => (
-            <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">
+            <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
               {skill}
             </span>
           ))}
@@ -1252,7 +1362,7 @@ function JobCard({ title, budget, duration, skills, company, featured, onClick }
         </div>
       </div>
 
-      <div className="bg-gray-50 p-4 flex justify-between items-center">
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
             <img src="/placeholder.svg" alt={company} className="w-full h-full object-cover" />

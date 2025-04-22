@@ -27,14 +27,23 @@
 .dark {
   --background: 15, 23, 42; /* #0f172a */
   --foreground: 248, 250, 252; /* #f8fafc */
-  --card: 30, 41, 59;
-  --card-foreground: 248, 250, 252;
-  --popover: 30, 41, 59;
-  --popover-foreground: 248, 250, 252;
-  --muted: 51, 65, 85;
-  --muted-foreground: 148, 163, 184;
-  --border: 51, 65, 85;
-  --input: 51, 65, 85;
+  --card: 30, 41, 59; /* #1e293b */
+  --card-foreground: 248, 250, 252; /* #f8fafc */
+  --popover: 30, 41, 59; /* #1e293b */
+  --popover-foreground: 248, 250, 252; /* #f8fafc */
+  --primary: 26, 44, 255; /* #1a2cff - slightly lighter in dark mode */
+  --primary-foreground: 255, 255, 255; /* white */
+  --secondary: 51, 65, 85; /* #334155 */
+  --secondary-foreground: 248, 250, 252; /* #f8fafc */
+  --muted: 51, 65, 85; /* #334155 */
+  --muted-foreground: 148, 163, 184; /* #94a3b8 */
+  --accent: 0, 200, 83; /* #00c853 - keep the same */
+  --accent-foreground: 255, 255, 255; /* white */
+  --destructive: 239, 68, 68; /* #ef4444 */
+  --destructive-foreground: 248, 250, 252; /* #f8fafc */
+  --border: 51, 65, 85; /* #334155 */
+  --input: 51, 65, 85; /* #334155 */
+  --ring: 26, 44, 255; /* #1a2cff */
 }
 
 body {
@@ -149,11 +158,81 @@ body {
   animation: marquee2 linear infinite;
 }
 
+/* Pulse animation */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Bounce animation */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+/* Glow effect */
+.glow-effect {
+  box-shadow: 0 0 15px rgba(var(--accent), 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 25px rgba(var(--accent), 0.8);
+}
+
 .glass-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
 }
 
 .text-gradient {
@@ -168,6 +247,58 @@ body {
 
 .bg-gradient-accent {
   background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-light)));
+}
+
+/* Growing community section enhancement */
+.stat-card {
+  @apply relative overflow-hidden rounded-lg p-6 transition-all duration-300;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+}
+
+.stat-card:hover::before {
+  animation: shimmer 1.5s infinite;
+}
+
+/* Get Started button enhancement */
+.get-started-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.get-started-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+}
+
+.get-started-btn:hover::after {
+  transform: translateX(100%);
+  transition: transform 0.6s ease;
 }
 
 @layer components {
@@ -202,4 +333,29 @@ body {
   .section-subtitle {
     @apply text-xl md:text-2xl font-semibold mb-4;
   }
+}
+
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-card:hover {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.dark .stat-card {
+  background: rgba(30, 41, 59, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .stat-card:hover {
+  background: rgba(30, 41, 59, 0.4);
+}
+
+/* Dark mode text gradient */
+.dark .text-gradient {
+  background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent-light)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
