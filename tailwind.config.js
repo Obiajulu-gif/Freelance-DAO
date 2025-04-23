@@ -55,21 +55,6 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        success: {
-          DEFAULT: "#10b981", // Emerald-500
-          light: "#34d399", // Emerald-400
-          dark: "#059669", // Emerald-600
-        },
-        warning: {
-          DEFAULT: "#f59e0b", // Amber-500
-          light: "#fbbf24", // Amber-400
-          dark: "#d97706", // Amber-600
-        },
-        error: {
-          DEFAULT: "#ef4444", // Red-500
-          light: "#f87171", // Red-400
-          dark: "#dc2626", // Red-600
-        },
       },
       borderRadius: {
         lg: "var(--radius)",

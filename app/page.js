@@ -1,16 +1,13 @@
-"use client"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
-import NavigationHub from "@/components/NavigationHub"
-
-export default function HomePage() {
+export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
-      <div className="pt-20">
-        <NavigationHub />
+    <div className="flex min-h-screen flex-col items-center justify-center p-24">
+      <h1 className="text-4xl font-bold text-center">Freelance DAO</h1>
+      <p className="mt-4 text-xl text-center">A decentralized freelancing platform built on Solana</p>
+      <div className="mt-8">
+        <a href="/landing" className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
+          Go to Landing Page
+        </a>
       </div>
-      <Footer />
     </div>
   )
 }
