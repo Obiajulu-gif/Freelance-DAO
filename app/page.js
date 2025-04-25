@@ -17,6 +17,9 @@ import {
   Briefcase,
   Shield,
   Code,
+  Paintbrush,
+  FileText,
+  BarChart3,
 } from "lucide-react"
 
 // Typewriter effect component
@@ -363,6 +366,27 @@ export default function Home() {
       skills: ["Solidity", "Rust", "Auditing", "Security"],
     },
     {
+      id: "graphic-design",
+      label: "Graphic Design",
+      icon: <Paintbrush size={24} />,
+      description: "1,450+ freelancers",
+      skills: ["UI/UX", "Branding", "Illustration", "Motion Graphics"],
+    },
+    {
+      id: "content-writing",
+      label: "Content Writing",
+      icon: <FileText size={24} />,
+      description: "1,280+ freelancers",
+      skills: ["Copywriting", "Technical Writing", "SEO", "Editing"],
+    },
+    {
+      id: "marketing",
+      label: "Marketing",
+      icon: <BarChart3 size={24} />,
+      description: "950+ freelancers",
+      skills: ["Social Media", "SEO", "Analytics", "Growth"],
+    },
+    {
       id: "nft",
       label: "NFT & Digital Art",
       icon: <Image src="/nft-icon.svg" width={24} height={24} alt="NFT Icon" />,
@@ -472,7 +496,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
               >
-                Find the perfect <span className="text-accent-light">web3 talent</span> for your project
+                Work. Earn. Own the <span className="text-accent-light">Future of Freelancing</span>
               </motion.h1>
 
               <motion.p
@@ -481,7 +505,7 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-lg md:text-xl mb-8 text-white/90 max-w-lg h-16 md:h-auto"
               >
-                <TypewriterText text="The first decentralized freelancing platform built on Solana, where talent and opportunity connect." />
+                <TypewriterText text="The first hybrid freelancing platform connecting both web2 and web3 talent with opportunities on a decentralized network." />
               </motion.p>
 
               {/* Talent Categories */}
@@ -525,7 +549,7 @@ export default function Home() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                   <input
                     type="text"
-                    placeholder={`Search for ${category} experts...`}
+                    placeholder={`Search for ${category === "web3" ? "web3" : "freelance"} experts...`}
                     className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white dark:border-gray-600"
                   />
                 </div>
@@ -583,14 +607,14 @@ export default function Home() {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  className="relative w-full h-full"
+                  className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl"
                 >
                   <Image
-                    src="/hero-illustration.svg"
-                    alt="FreeLance DAO Illustration"
+                    src="/hero-freelancers.png"
+                    alt="FreeLance DAO - Hybrid Freelancing Platform"
                     width={600}
                     height={400}
-                    className="w-full h-auto"
+                    className="w-full h-full object-cover"
                   />
                 </motion.div>
               </div>

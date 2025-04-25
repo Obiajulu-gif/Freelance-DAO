@@ -49,7 +49,9 @@ export default function Footer() {
             <ul className="space-y-2">
               <FooterLink href="/help-support">Help & Support</FooterLink>
               <FooterLink href="/success-stories">Success Stories</FooterLink>
-              <FooterLink href="/blog">Blog</FooterLink>
+              <FooterLink href="https://medium.com/@freelancedao" target="_blank" rel="noopener noreferrer">
+                Blog
+              </FooterLink>
               <FooterLink href="/governance">DAO Governance</FooterLink>
               <FooterLink href="/developers">Developers</FooterLink>
             </ul>
