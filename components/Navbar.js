@@ -148,46 +148,30 @@ export default function Navbar() {
             {/* Desktop Right Side */}
             <div className="hidden md:flex items-center space-x-2">
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${
-                  isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"
-                }`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               >
                 <Search size={20} />
               </button>
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${
-                  isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"
-                }`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               >
                 <Bell size={20} />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${
-                  isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"
-                }`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               >
                 <MessageSquare size={20} />
               </button>
 
               <ThemeToggle
-                className={`hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                  isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"
-                }`}
+                className={`hover:bg-gray-100 dark:hover:bg-gray-800 ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
               />
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`ml-2 ${
-                  isScrolled
-                    ? "bg-gradient-to-r from-green-500 to-green-400"
-                    : "bg-gradient-to-r from-accent to-accent-light"
-                } text-white font-medium py-2 px-4 rounded-full transition-all duration-300 flex items-center shadow-lg ${
-                  isScrolled
-                    ? "shadow-green-500/20 hover:shadow-green-500/40"
-                    : "shadow-accent/20 hover:shadow-accent/40"
-                }`}
+                className="ml-2 bg-gradient-to-r from-accent to-accent-light text-white font-medium py-2 px-4 rounded-full transition-all duration-300 flex items-center shadow-lg shadow-accent/20 hover:shadow-accent/40"
               >
                 <Wallet size={16} className="mr-2" />
                 Connect Wallet
@@ -197,8 +181,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
-              className={`md:hidden p-2 rounded-md ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
-              aria-label="Toggle menu"
+              className={`md:hidden p-2 rounded-md ${isScrolled ? "text-gray-700" : "text-white"}`}
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -214,51 +197,48 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg z-40 md:hidden max-h-[calc(100vh-4rem)] overflow-y-auto"
+            className="fixed top-16 left-0 right-0 bg-white shadow-lg z-40 md:hidden"
           >
             <div className="container mx-auto px-4 py-4">
               <div className="flex flex-col space-y-4">
                 <MobileNavAccordion title="Find Talent" icon={<Users size={20} />}>
-                  <Link href="/freelancers" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/freelancers" className="block py-2 px-4 hover:bg-gray-50">
                     Browse Freelancers
                   </Link>
-                  <Link href="/agencies" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/agencies" className="block py-2 px-4 hover:bg-gray-50">
                     Browse Agencies
                   </Link>
-                  <Link href="/projects" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/projects" className="block py-2 px-4 hover:bg-gray-50">
                     Project Catalog
                   </Link>
-                  <Link href="/enterprise" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/enterprise" className="block py-2 px-4 hover:bg-gray-50">
                     Enterprise Solutions
                   </Link>
                 </MobileNavAccordion>
 
                 <MobileNavAccordion title="Find Work" icon={<Briefcase size={20} />}>
-                  <Link href="/gigs" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/gigs" className="block py-2 px-4 hover:bg-gray-50">
                     Browse Jobs
                   </Link>
-                  <Link href="/saved-jobs" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/saved-jobs" className="block py-2 px-4 hover:bg-gray-50">
                     Saved Jobs
                   </Link>
-                  <Link href="/proposals" className="block py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Link href="/proposals" className="block py-2 px-4 hover:bg-gray-50">
                     Proposals
                   </Link>
                 </MobileNavAccordion>
 
-                <Link href="/post-job" className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <Link href="/post-job" className="flex items-center py-3 px-4 hover:bg-gray-50">
                   <FileText size={20} className="mr-3 text-primary" />
                   <span>Post a Job</span>
                 </Link>
 
-                <Link href="/dashboard" className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <Link href="/dashboard" className="flex items-center py-3 px-4 hover:bg-gray-50">
                   <LayoutDashboard size={20} className="mr-3 text-primary" />
                   <span>My Dashboard</span>
                 </Link>
 
-                <Link
-                  href="/governance"
-                  className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
+                <Link href="/governance" className="flex items-center py-3 px-4 hover:bg-gray-50">
                   <Vote size={20} className="mr-3 text-primary" />
                   <span>DAO Governance</span>
                 </Link>
@@ -268,14 +248,14 @@ export default function Navbar() {
                   <ThemeToggle />
                 </div>
 
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <button className="w-full bg-gradient-to-r from-green-500 to-green-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg">
+                <div className="pt-2 border-t border-gray-200">
+                  <button className="w-full bg-gradient-to-r from-accent to-accent-light text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg">
                     <Wallet size={18} className="mr-2" />
                     Connect Wallet
                   </button>
                 </div>
 
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
                   <button className="flex items-center text-sm">
                     <Globe size={16} className="mr-2" />
                     <span>English</span>
@@ -302,9 +282,7 @@ function NavItem({ href, children, isScrolled }) {
     <Link
       href={href}
       className={`px-4 py-2 rounded-md font-medium transition-colors duration-200 ${
-        isScrolled
-          ? "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-          : "text-white hover:bg-white/10"
+        isScrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white/10"
       }`}
     >
       {children}
@@ -321,10 +299,10 @@ function NavDropdown({ title, children, isActive, onClick, isScrolled }) {
         className={`flex items-center px-4 py-2 rounded-md font-medium transition-colors duration-200 ${
           isActive
             ? isScrolled
-              ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
+              ? "bg-gray-100 text-gray-900"
               : "bg-white/10 text-white"
             : isScrolled
-              ? "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              ? "text-gray-700 hover:bg-gray-100"
               : "text-white hover:bg-white/10"
         }`}
       >
@@ -339,7 +317,7 @@ function NavDropdown({ title, children, isActive, onClick, isScrolled }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50"
+            className="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50"
           >
             {children}
           </motion.div>
@@ -352,14 +330,11 @@ function NavDropdown({ title, children, isActive, onClick, isScrolled }) {
 // Dropdown Link Item
 function DropdownLink({ href, icon, title, description }) {
   return (
-    <Link
-      href={href}
-      className="flex items-start p-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-    >
+    <Link href={href} className="flex items-start p-3 rounded-md hover:bg-gray-50 transition-colors duration-200">
       <div className="text-primary mr-3 mt-1">{icon}</div>
       <div>
-        <div className="font-medium text-gray-900 dark:text-white">{title}</div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">{description}</div>
+        <div className="font-medium text-gray-900">{title}</div>
+        <div className="text-sm text-gray-500">{description}</div>
       </div>
     </Link>
   )
@@ -373,11 +348,11 @@ function MobileNavAccordion({ title, icon, children }) {
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800"
+        className="flex items-center justify-between w-full py-3 px-4 hover:bg-gray-50"
       >
         <div className="flex items-center">
           <span className="mr-3 text-primary">{icon}</span>
-          <span className="text-gray-800 dark:text-white">{title}</span>
+          <span>{title}</span>
         </div>
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </button>
@@ -389,7 +364,7 @@ function MobileNavAccordion({ title, icon, children }) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden bg-gray-50 dark:bg-gray-800"
+            className="overflow-hidden bg-gray-50"
           >
             {children}
           </motion.div>

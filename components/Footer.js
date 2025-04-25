@@ -4,10 +4,10 @@ import { Facebook, Twitter, Instagram, Linkedin, GitlabIcon as GitHub } from "lu
 
 export default function Footer() {
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          <div className="col-span-1 lg:col-span-2">
+    <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+          <div className="col-span-2">
             <Link href="/" className="flex items-center mb-4">
               <Image src="/logo.png" alt="FreeLance DAO" width={40} height={40} className="mr-2" />
               <span className="font-bold text-xl text-primary">FreeLance DAO</span>
@@ -56,7 +56,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 dark:text-gray-500 text-sm mb-4 md:mb-0">
             © {new Date().getFullYear()} FreeLance DAO. All rights reserved.
           </p>
@@ -94,7 +94,7 @@ function SocialLink({ href, icon }) {
   return (
     <Link
       href={href}
-      className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-primary hover:text-white transition-colors"
+      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition-colors"
     >
       {icon}
     </Link>
