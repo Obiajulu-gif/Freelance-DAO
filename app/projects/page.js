@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Filter, X } from "lucide-react"
+import { Search, Filter, Clock, Tag, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 // Sample data for projects
@@ -15,6 +15,7 @@ const PROJECTS_DATA = [
     priceType: "Fixed price",
     skills: ["NFT", "Marketplace", "Web3"],
     image: "/interconnected-web3.png",
+    category: "nft",
   },
   {
     id: 2,
@@ -24,7 +25,8 @@ const PROJECTS_DATA = [
     duration: "3 weeks delivery",
     priceType: "Fixed price",
     skills: ["Smart Contracts", "Solidity", "DeFi"],
-    image: "/placeholder.svg?key=8l4qb",
+    image: "/interconnected-contracts.png",
+    category: "smart-contracts",
   },
   {
     id: 3,
@@ -34,210 +36,94 @@ const PROJECTS_DATA = [
     duration: "1 week delivery",
     priceType: "Fixed price",
     skills: ["React", "Web3", "Frontend"],
-    image: "/placeholder.svg?height=160&width=400&query=frontend",
-  \
+    image: "/modern-web-interface.png",
+    category: "web3",
+  },
+  {
+    id: 4,
+    title: "DeFi Protocol Setup",
+    description: "Complete DeFi protocol with lending, borrowing, and yield farming capabilities.",
+    price: 4500,
+    duration: "4 weeks delivery",
+    priceType: "Fixed price",
+    skills: ["DeFi", "Smart Contracts", "Tokenomics"],
+    image: "/decentralized-network.png",
+    category: "defi",
+  },
+  {
+    id: 5,
+    title: "DAO Governance System",
+    description: "Complete DAO governance system with proposal creation, voting, and execution.",
+    price: 3000,
+    duration: "3 weeks delivery",
+    priceType: "Fixed price",
+    skills: ["DAO", "Governance", "Smart Contracts"],
+    image: "/interconnected-nodes.png",
+    category: "dao",
+  },
+  {
+    id: 6,
+    title: "Solana Program Development",
+    description: "Custom Solana program development with Rust and Anchor framework.",
+    price: 2800,
+    duration: "4 weeks delivery",
+    priceType: "Fixed price",
+    skills: ["Solana", "Rust", "Anchor"],
+    image: "/glowing-solana-network.png",
+    category: "smart-contracts",
+  },
 ]
 
 export default function Projects() {
-  const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [showFilters, setShowFilters] = useState(false)
+  const [activeCategory, setActiveCategory] = useState("All Projects")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [projects, setProjects] = useState([])
-  const [filteredProjects, setFilteredProjects] = useState([])
-  const [activeCategory, setActiveCategory] = useState("all")
-  
-  // Filter states
-  const [selectedTechnologies, setSelectedTechnologies] = useState([])
+  const [loading, setLoading] = useState(true)
   const [priceRange, setPriceRange] = useState([0, 5000])
-  const [deliveryTime, setDeliveryTime] = useState("all")
 
-  // Categories
-  const categories = [
-    { id: "all", name: "All Projects" },
-    { id: "smart-contracts", name: "Smart Contracts" },
-    { id: "web3", name: "Web3 Development" },
-    { id: "nft", name: "NFT Collections" },
-    { id: "defi", name: "DeFi Solutions" },
-    { id: "dao", name: "DAO Management" }
-  ]
-
-  // Available technologies for filtering
-  const availableTechnologies = [
-    "React", "Next.js", "Solidity", "Rust", "Solana", "Ethereum", 
-    "IPFS", "The Graph", "Hardhat", "Foundry", "Anchor"
-  ]
-
-  // Delivery time options
-  const deliveryTimeOptions = [
-    { value: "all", label: "Any Time" },
-    { value: "1week", label: "Up to 1 week" },
-    { value: "2weeks", label: "Up to 2 weeks" },
-    { value: "1month", label: "Up to 1 month" },
-    { value: "3months", label: "Up to 3 months" }
-  ]
-
-  // Simulated data loading
+  // Simulate loading data
   useEffect(() => {
-    const loadProjects = async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Sample data
-      const data = [
-        {
-          id: 1,
-          title: "NFT Marketplace Setup",
-          description: "Complete NFT marketplace setup with minting, listing, and trading functionality.",
-          price: 1500,
-          deliveryTime: "2weeks",
-          technologies: ["React", "Next.js", "Solidity", "IPFS"],
-          category: "nft",
-          image: "/interconnected-web3.png"
-        },
-        {
-          id: 2,
-          title: "Smart Contract Development",
-          description: "Custom smart contract development for your blockchain project with full testing and deployment.",
-          price: 2000,
-          deliveryTime: "2weeks",
-          technologies: ["Solidity", "Hardhat", "Ethereum"],
-          category: "smart-contracts",
-          image: "/placeholder.svg?key=y0lrq"
-        },
-        {
-          id: 3,
-          title: "DeFi Protocol Setup",
-          description: "Complete DeFi protocol with lending, borrowing, and yield farming capabilities.",
-          price: 4500,
-          deliveryTime: "1month",
-          technologies: ["Solidity", "React", "The Graph"],
-          category: "defi",
-          image: "/placeholder.svg?key=isets"
-        },
-        {
-          id: 4,
-          title: "DAO Governance System",
-          description: "Complete DAO governance system with proposal creation, voting, and execution.",
-          price: 3000,
-          deliveryTime: "3months",
-          technologies: ["Solidity", "React", "The Graph"],
-          category: "dao",
-          image: "/placeholder.svg?key=zdbxg"
-        },
-        {
-          id: 5,
-          title: "Web3 Frontend Integration",
-          description: "Integration of Web3 functionality into your existing frontend application.",
-          price: 1200,
-          deliveryTime: "1week",
-          technologies: ["React", "Next.js", "Ethereum"],
-          category: "web3",
-          image: "/placeholder.svg?key=6cra9"
-        },
-        {
-          id: 6,
-          title: "Solana Program Development",
-          description: "Custom Solana program development with Rust and Anchor framework.",
-          price: 2800,
-          deliveryTime: "1month",
-          technologies: ["Rust", "Anchor", "Solana"],
-          category: "smart-contracts",
-          image: "/placeholder.svg?key=lh5v7"
-        }
-      ]
-      
-      setProjects(data)
-      setFilteredProjects(data)
-      setIsLoading(false)
-    }
-    
-    loadProjects()
+    const timer = setTimeout(() => {
+      setProjects(PROJECTS_DATA)
+      setLoading(false)
+    }, 800)
+
+    return () => clearTimeout(timer)
   }, [])
 
-  // Handle search, category, and filtering
-  useEffect(() => {
-    let results = [...projects]
-    
-    // Apply category filter
-    if (activeCategory !== "all") {
-      results = results.filter(project => project.category === activeCategory)
-    }
-    
-    // Apply search term
-    if (searchTerm) {
-      results = results.filter(
-        project => 
-          project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          project.technologies.some(tech => 
-            tech.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-      )
-    }
-    
-    // Apply technology filters
-    if (selectedTechnologies.length > 0) {
-      results = results.filter(
-        project => selectedTechnologies.some(tech => 
-          project.technologies.includes(tech)
-        )
-      )
-    }
-    
-    // Apply price range filter
-    results = results.filter(
-      project => 
-        project.price >= priceRange[0] && 
-        project.price <= priceRange[1]
-    )
-    
-    // Apply delivery time filter
-    if (deliveryTime !== "all") {
-      results = results.filter(
-        project => {
-          const deliveryTimeMap = {
-            "1week": ["1week"],
-            "2weeks": ["1week", "2weeks"],
-            "1month": ["1week", "2weeks", "1month"],
-            "3months": ["1week", "2weeks", "1month", "3months"]
-          }
-          return deliveryTimeMap[deliveryTime]?.includes(project.deliveryTime)
-        }
-      )
-    }
-    
-    setFilteredProjects(results)
-  }, [searchTerm, activeCategory, selectedTechnologies, priceRange, deliveryTime, projects])
+  // Filter projects based on search term and active category
+  const filteredProjects = projects.filter((project) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.skills.some((skill) => skill.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const toggleTechnology = (tech) => {
-    if (selectedTechnologies.includes(tech)) {
-      setSelectedTechnologies(selectedTechnologies.filter(t => t !== tech))
-    } else {
-      setSelectedTechnologies([...selectedTechnologies, tech])
-    }
+    const matchesCategory =
+      activeCategory === "All Projects" ||
+      (activeCategory === "Smart Contracts" && project.category === "smart-contracts") ||
+      (activeCategory === "Web3 Development" && project.category === "web3") ||
+      (activeCategory === "NFT Collections" && project.category === "nft") ||
+      (activeCategory === "DeFi Solutions" && project.category === "defi") ||
+      (activeCategory === "DAO Management" && project.category === "dao")
+
+    const matchesPriceRange = project.price >= priceRange[0] && project.price <= priceRange[1]
+
+    return matchesSearch && matchesCategory && matchesPriceRange
+  })
+
+  const clearFilters = () => {
+    setActiveCategory("All Projects")
+    setSearchTerm("")
+    setPriceRange([0, 5000])
   }
 
-  const handlePriceChange = (e, index) => {
+  const handlePriceRangeChange = (e, index) => {
     const newValue = Number.parseInt(e.target.value)
     const newRange = [...priceRange]
     newRange[index] = newValue
-    
-    // Ensure min <= max
-    if (index === 0 && newValue > priceRange[1]) {
-      newRange[1] = newValue
-    } else if (index === 1 && newValue < priceRange[0]) {
-      newRange[0] = newValue
-    }
-    
     setPriceRange(newRange)
-  }
-
-  const clearFilters = () => {
-    setSelectedTechnologies([])
-    setPriceRange([0, 5000])
-    setDeliveryTime("all")
-    setSearchTerm("")
-    setActiveCategory("all")
   }
 
   return (
@@ -256,133 +142,74 @@ export default function Projects() {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           {searchTerm && (
-            <button 
+            <button
               onClick={() => setSearchTerm("")}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           )}
         </div>
 
-        <button 
+        <button
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
           className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
-            showFilters || selectedTechnologies.length > 0 || priceRange[0] > 0 || priceRange[1] < 5000 || deliveryTime !== "all"
+            isFilterOpen || activeCategory !== "All Projects" || priceRange[0] > 0 || priceRange[1] < 5000
               ? "bg-primary text-white border-primary"
               : "hover:bg-gray-100 dark:hover:bg-gray-800"
           }`}
-          onClick={() => setShowFilters(!showFilters)}
         >
           <Filter size={18} />
           <span>Filters</span>
-          
         </button>
       </div>
 
-      {/* Categories */}
-      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2">
-        {categories.map(category => (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              activeCategory === category.id
-                ? "bg-primary text-white"
-                : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
-
-      {/* Filters Panel */}
+      {/* Filter Panel */}
       <AnimatePresence>
-        {showFilters && (
+        {isFilterOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden mb-6"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6 overflow-hidden"
           >
-            <div className="bg-white dark:bg-gray-800 border rounded-lg p-4 shadow-sm">
+            <div className="bg-white dark:bg-gray-800 border rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold">Filters</h3>
-                <button 
-                  onClick={clearFilters}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Clear all
-                </button>
+                <h3 className="font-bold">Filter Projects</h3>
+                {(activeCategory !== "All Projects" || priceRange[0] > 0 || priceRange[1] < 5000) && (
+                  <button onClick={clearFilters} className="text-sm text-primary hover:underline">
+                    Clear all filters
+                  </button>
+                )}
               </div>
-              
-              <div className="grid md:grid-cols-3 gap-6">
-                {/* Technologies */}
+
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium mb-2">Technologies</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {availableTechnologies.map(tech => (
-                      <button
-                        key={tech}
-                        onClick={() => toggleTechnology(tech)}
-                        className={`text-xs px-2 py-1 rounded-full transition-colors ${
-                          selectedTechnologies.includes(tech)
-                            ? "bg-primary text-white"
-                            : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-                        }`}
-                      >
-                        {tech}
-                      </button>
-                    ))}
+                  <h4 className="text-sm font-medium mb-2">Price Range</h4>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="5000"
+                      step="100"
+                      value={priceRange[0]}
+                      onChange={(e) => handlePriceRangeChange(e, 0)}
+                      className="w-full"
+                    />
+                    <span className="text-sm">Min: ${priceRange[0]}</span>
                   </div>
-                </div>
-                
-                {/* Price Range */}
-                <div>
-                  <h4 className="font-medium mb-2">Price Range</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">${priceRange[0]}</span>
-                      <span className="text-sm">${priceRange[1]}+</span>
-                    </div>
-                    <div className="flex gap-4">
-                      <input
-                        type="range"
-                        min="0"
-                        max="5000"
-                        step="100"
-                        value={priceRange[0]}
-                        onChange={(e) => handlePriceChange(e, 0)}
-                        className="w-full"
-                      />
-                      <input
-                        type="range"
-                        min="0"
-                        max="5000"
-                        step="100"
-                        value={priceRange[1]}
-                        onChange={(e) => handlePriceChange(e, 1)}
-                        className="w-full"
-                      />
-                    </div>
+                  <div className="flex items-center gap-4 mt-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="5000"
+                      step="100"
+                      value={priceRange[1]}
+                      onChange={(e) => handlePriceRangeChange(e, 1)}
+                      className="w-full"
+                    />
+                    <span className="text-sm">Max: ${priceRange[1]}</span>
                   </div>
-                </div>
-                
-                {/* Delivery Time */}
-                <div>
-                  <h4 className="font-medium mb-2">Delivery Time</h4>
-                  <select
-                    value={deliveryTime}
-                    onChange={(e) => setDeliveryTime(e.target.value)}
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:border-gray-600"
-                  >
-                    {deliveryTimeOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
             </div>
@@ -390,11 +217,133 @@ export default function Projects() {
         )}
       </AnimatePresence>
 
-      {/* Results count */}
-      <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-        {filteredProjects.length} projects found
+      {/* Categories */}
+      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2">
+        {[
+          "All Projects",
+          "Smart Contracts",
+          "Web3 Development",
+          "NFT Collections",
+          "DeFi Solutions",
+          "DAO Management",
+        ].map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
+              activeCategory === category
+                ? "bg-primary text-white"
+                : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
       </div>
 
-      {/* Projects Grid */}
-      {isLoading ? (
+      {/* Loading State */}
+      {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <ProjectCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filteredProjects.length > 0 ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Search size={24} className="text-gray-400" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">No projects found</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">Try adjusting your search or filters</p>
+          <button onClick={clearFilters} className="btn-primary inline-flex">
+            Clear Filters
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ProjectCard({ project }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="card overflow-hidden hover:border-primary transition-colors"
+    >
+      <div className="h-40 bg-gray-200 relative">
+        <img src={project.image || "/placeholder.svg"} alt={project.title} className="w-full h-full object-cover" />
+      </div>
+
+      <div className="p-4">
+        <h3 className="font-bold text-lg mb-2">{project.title}</h3>
+
+        <div className="flex flex-wrap gap-2 mb-3">
+          {project.skills.map((skill) => (
+            <span key={skill} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              {skill}
+            </span>
+          ))}
+        </div>
+
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">{project.description}</p>
+
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          <div className="flex items-center">
+            <Clock size={14} className="mr-1" />
+            <span>{project.duration}</span>
+          </div>
+          <div className="flex items-center">
+            <Tag size={14} className="mr-1" />
+            <span>{project.priceType}</span>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t flex justify-between items-center">
+          <div>
+            <span className="font-bold text-lg">${project.price}</span>
+          </div>
+          <button className="btn-outline text-sm py-1">View Details</button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function ProjectCardSkeleton() {
+  return (
+    <div className="card overflow-hidden animate-pulse">
+      <div className="h-40 bg-gray-200 dark:bg-gray-700"></div>
+
+      <div className="p-4">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3"></div>
+
+        <div className="flex flex-wrap gap-2 mb-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+          ))}
+        </div>
+
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
+
+        <div className="flex justify-between items-center">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t flex justify-between items-center">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+        </div>
+      </div>
+    </div>
+  )
+}
