@@ -19,17 +19,18 @@ import {
   Wallet,
   Globe,
 } from "lucide-react"
-
-// Import the ThemeToggle component at the top of the file
 import ThemeToggle from "./ThemeToggle"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null)
+  const [mounted, setMounted] = useState(false)
 
   // Handle scroll effect for navbar
   useEffect(() => {
+    setMounted(true)
+
     const handleScroll = () => {
       if (window.scrollY > 10) {
         setIsScrolled(true)
@@ -37,6 +38,9 @@ export default function Navbar() {
         setIsScrolled(false)
       }
     }
+
+    // Set initial scroll state
+    handleScroll()
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
@@ -58,10 +62,13 @@ export default function Navbar() {
     setActiveDropdown(null)
   }
 
+  // Don't render anything on the server to prevent hydration mismatch
+  if (!mounted) return null
+
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`block w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled ? "bg-white dark:bg-gray-900 shadow-md py-2" : "bg-transparent py-4"
         }`}
       >
@@ -70,7 +77,11 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <Image src="/logo.png" alt="FreeLance DAO" width={40} height={40} className="mr-2" />
-              <span className={`font-bold text-xl ${isScrolled ? "text-primary" : "text-white"}`}>FreeLance DAO</span>
+              <span
+                className={`font-bold text-xl ${isScrolled || !isHomePage() ? "text-primary dark:text-white" : "text-white"}`}
+              >
+                FreeLance DAO
+              </span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -80,6 +91,7 @@ export default function Navbar() {
                 isActive={activeDropdown === "talent"}
                 onClick={() => toggleDropdown("talent")}
                 isScrolled={isScrolled}
+                isHomePage={isHomePage()}
               >
                 <div className="grid grid-cols-2 gap-4 p-4">
                   <DropdownLink
@@ -114,6 +126,7 @@ export default function Navbar() {
                 isActive={activeDropdown === "work"}
                 onClick={() => toggleDropdown("work")}
                 isScrolled={isScrolled}
+                isHomePage={isHomePage()}
               >
                 <div className="grid grid-cols-1 gap-2 p-4">
                   <DropdownLink
@@ -137,10 +150,10 @@ export default function Navbar() {
                 </div>
               </NavDropdown>
 
-              <NavItem href="/post-job" isScrolled={isScrolled}>
+              <NavItem href="/post-job" isScrolled={isScrolled} isHomePage={isHomePage()}>
                 Post a Job
               </NavItem>
-              <NavItem href="/governance" isScrolled={isScrolled}>
+              <NavItem href="/governance" isScrolled={isScrolled} isHomePage={isHomePage()}>
                 DAO Governance
               </NavItem>
             </nav>
@@ -148,24 +161,32 @@ export default function Navbar() {
             {/* Desktop Right Side */}
             <div className="hidden md:flex items-center space-x-2">
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${
+                  isScrolled || !isHomePage() ? "text-gray-700 dark:text-gray-300" : "text-white"
+                }`}
               >
                 <Search size={20} />
               </button>
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${
+                  isScrolled || !isHomePage() ? "text-gray-700 dark:text-gray-300" : "text-white"
+                }`}
               >
                 <Bell size={20} />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               <button
-                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+                className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative ${
+                  isScrolled || !isHomePage() ? "text-gray-700 dark:text-gray-300" : "text-white"
+                }`}
               >
                 <MessageSquare size={20} />
               </button>
 
               <ThemeToggle
-                className={`hover:bg-gray-100 dark:hover:bg-gray-800 ${isScrolled ? "text-gray-700 dark:text-gray-300" : "text-white"}`}
+                className={`hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  isScrolled || !isHomePage() ? "text-gray-700 dark:text-gray-300" : "text-white"
+                }`}
               />
 
               <motion.button
@@ -181,7 +202,9 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
-              className={`md:hidden p-2 rounded-md ${isScrolled ? "text-gray-700" : "text-white"}`}
+              className={`md:hidden p-2 rounded-md ${
+                isScrolled || !isHomePage() ? "text-gray-700 dark:text-gray-300" : "text-white"
+              }`}
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -197,48 +220,51 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 bg-white shadow-lg z-40 md:hidden"
+            className="fixed top-16 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg z-40 md:hidden"
           >
             <div className="container mx-auto px-4 py-4">
               <div className="flex flex-col space-y-4">
                 <MobileNavAccordion title="Find Talent" icon={<Users size={20} />}>
-                  <Link href="/freelancers" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/freelancers" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Browse Freelancers
                   </Link>
-                  <Link href="/agencies" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/agencies" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Browse Agencies
                   </Link>
-                  <Link href="/projects" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/projects" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Project Catalog
                   </Link>
-                  <Link href="/enterprise" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/enterprise" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Enterprise Solutions
                   </Link>
                 </MobileNavAccordion>
 
                 <MobileNavAccordion title="Find Work" icon={<Briefcase size={20} />}>
-                  <Link href="/gigs" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/gigs" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Browse Jobs
                   </Link>
-                  <Link href="/saved-jobs" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/saved-jobs" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Saved Jobs
                   </Link>
-                  <Link href="/proposals" className="block py-2 px-4 hover:bg-gray-50">
+                  <Link href="/proposals" className="block py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                     Proposals
                   </Link>
                 </MobileNavAccordion>
 
-                <Link href="/post-job" className="flex items-center py-3 px-4 hover:bg-gray-50">
+                <Link href="/post-job" className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                   <FileText size={20} className="mr-3 text-primary" />
                   <span>Post a Job</span>
                 </Link>
 
-                <Link href="/dashboard" className="flex items-center py-3 px-4 hover:bg-gray-50">
+                <Link href="/dashboard" className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800">
                   <LayoutDashboard size={20} className="mr-3 text-primary" />
                   <span>My Dashboard</span>
                 </Link>
 
-                <Link href="/governance" className="flex items-center py-3 px-4 hover:bg-gray-50">
+                <Link
+                  href="/governance"
+                  className="flex items-center py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
                   <Vote size={20} className="mr-3 text-primary" />
                   <span>DAO Governance</span>
                 </Link>
@@ -248,14 +274,14 @@ export default function Navbar() {
                   <ThemeToggle />
                 </div>
 
-                <div className="pt-2 border-t border-gray-200">
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                   <button className="w-full bg-gradient-to-r from-accent to-accent-light text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg">
                     <Wallet size={18} className="mr-2" />
                     Connect Wallet
                   </button>
                 </div>
 
-                <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                   <button className="flex items-center text-sm">
                     <Globe size={16} className="mr-2" />
                     <span>English</span>
@@ -276,13 +302,23 @@ export default function Navbar() {
   )
 }
 
+// Helper function to check if we're on the home page
+function isHomePage() {
+  if (typeof window !== "undefined") {
+    return window.location.pathname === "/" || window.location.pathname === "/home"
+  }
+  return false
+}
+
 // Desktop Navigation Item
-function NavItem({ href, children, isScrolled }) {
+function NavItem({ href, children, isScrolled, isHomePage }) {
   return (
     <Link
       href={href}
       className={`px-4 py-2 rounded-md font-medium transition-colors duration-200 ${
-        isScrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white/10"
+        isScrolled || !isHomePage
+          ? "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          : "text-white hover:bg-white/10"
       }`}
     >
       {children}
@@ -291,18 +327,18 @@ function NavItem({ href, children, isScrolled }) {
 }
 
 // Desktop Navigation Dropdown
-function NavDropdown({ title, children, isActive, onClick, isScrolled }) {
+function NavDropdown({ title, children, isActive, onClick, isScrolled, isHomePage }) {
   return (
     <div className="relative">
       <button
         onClick={onClick}
         className={`flex items-center px-4 py-2 rounded-md font-medium transition-colors duration-200 ${
           isActive
-            ? isScrolled
-              ? "bg-gray-100 text-gray-900"
+            ? isScrolled || !isHomePage
+              ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
               : "bg-white/10 text-white"
-            : isScrolled
-              ? "text-gray-700 hover:bg-gray-100"
+            : isScrolled || !isHomePage
+              ? "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
               : "text-white hover:bg-white/10"
         }`}
       >
@@ -317,7 +353,7 @@ function NavDropdown({ title, children, isActive, onClick, isScrolled }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50"
+            className="absolute left-0 mt-2 w-80 bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden z-50"
           >
             {children}
           </motion.div>
@@ -330,11 +366,14 @@ function NavDropdown({ title, children, isActive, onClick, isScrolled }) {
 // Dropdown Link Item
 function DropdownLink({ href, icon, title, description }) {
   return (
-    <Link href={href} className="flex items-start p-3 rounded-md hover:bg-gray-50 transition-colors duration-200">
+    <Link
+      href={href}
+      className="flex items-start p-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+    >
       <div className="text-primary mr-3 mt-1">{icon}</div>
       <div>
-        <div className="font-medium text-gray-900">{title}</div>
-        <div className="text-sm text-gray-500">{description}</div>
+        <div className="font-medium text-gray-900 dark:text-white">{title}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{description}</div>
       </div>
     </Link>
   )
@@ -348,7 +387,7 @@ function MobileNavAccordion({ title, icon, children }) {
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full py-3 px-4 hover:bg-gray-50"
+        className="flex items-center justify-between w-full py-3 px-4 hover:bg-gray-50 dark:hover:bg-gray-800"
       >
         <div className="flex items-center">
           <span className="mr-3 text-primary">{icon}</span>
@@ -364,7 +403,7 @@ function MobileNavAccordion({ title, icon, children }) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden bg-gray-50"
+            className="overflow-hidden bg-gray-50 dark:bg-gray-800"
           >
             {children}
           </motion.div>
