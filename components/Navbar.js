@@ -153,9 +153,6 @@ export default function Navbar() {
               <NavItem href="/post-job" isScrolled={isScrolled} isHomePage={isHomePage()}>
                 Post a Job
               </NavItem>
-              <NavItem href="/verify-skills" isScrolled={isScrolled} isHomePage={isHomePage()}>
-                Verify Skills
-              </NavItem>
               <NavItem href="/governance" isScrolled={isScrolled} isHomePage={isHomePage()}>
                 DAO Governance
               </NavItem>

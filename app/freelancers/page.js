@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Search, Filter, Star, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import VerificationBadge from "@/components/skill-verification/VerificationBadge"
 
 // Sample data for freelancers
 const FREELANCERS_DATA = [
@@ -13,7 +14,8 @@ const FREELANCERS_DATA = [
     rating: 4.8,
     hourlyRate: 45,
     skills: ["React", "Node.js", "Solana", "Web3"],
-    image: "/placeholder.svg?height=64&width=64&query=person1",
+    image: "/thoughtful-portrait.png",
+    verified: true,
   },
   {
     id: 2,
@@ -22,7 +24,8 @@ const FREELANCERS_DATA = [
     rating: 5.0,
     hourlyRate: 65,
     skills: ["Solidity", "Rust", "Smart Contracts", "DeFi"],
-    image: "/placeholder.svg?height=64&width=64&query=person2",
+    image: "/diverse-group-chatting.png",
+    verified: false,
   },
   {
     id: 3,
@@ -31,7 +34,8 @@ const FREELANCERS_DATA = [
     rating: 4.7,
     hourlyRate: 40,
     skills: ["Figma", "UI/UX", "Web Design", "Mobile Design"],
-    image: "/placeholder.svg?height=64&width=64&query=person3",
+    image: "/diverse-group-chatting.png",
+    verified: true,
   },
   {
     id: 4,
@@ -40,7 +44,8 @@ const FREELANCERS_DATA = [
     rating: 4.9,
     hourlyRate: 75,
     skills: ["Ethereum", "Solana", "Architecture", "Security"],
-    image: "/placeholder.svg?height=64&width=64&query=person4",
+    image: "/diverse-group-chatting.png",
+    verified: false,
   },
   {
     id: 5,
@@ -49,7 +54,8 @@ const FREELANCERS_DATA = [
     rating: 4.6,
     hourlyRate: 55,
     skills: ["NFT", "ERC-721", "Marketplace", "Digital Art"],
-    image: "/placeholder.svg?height=64&width=64&query=person5",
+    image: "/diverse-group-city.png",
+    verified: true,
   },
   {
     id: 6,
@@ -58,7 +64,8 @@ const FREELANCERS_DATA = [
     rating: 4.8,
     hourlyRate: 60,
     skills: ["DeFi", "Yield Farming", "Staking", "Tokenomics"],
-    image: "/placeholder.svg?height=64&width=64&query=person6",
+    image: "/diverse-group-city.png",
+    verified: true,
   },
 ]
 
@@ -94,6 +101,7 @@ export default function Freelancers() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [freelancers, setFreelancers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showVerifiedOnly, setShowVerifiedOnly] = useState(false)
 
   // Simulate loading data
   useEffect(() => {
@@ -116,7 +124,9 @@ export default function Freelancers() {
     const matchesSkills =
       selectedSkills.length === 0 || selectedSkills.every((skill) => freelancer.skills.includes(skill))
 
-    return matchesSearch && matchesSkills
+    const matchesVerified = showVerifiedOnly ? freelancer.verified : true
+
+    return matchesSearch && matchesSkills && matchesVerified
   })
 
   const toggleSkill = (skill) => {
@@ -130,6 +140,7 @@ export default function Freelancers() {
   const clearFilters = () => {
     setSelectedSkills([])
     setSearchTerm("")
+    setShowVerifiedOnly(false)
   }
 
   return (
@@ -182,14 +193,14 @@ export default function Freelancers() {
             <div className="bg-white dark:bg-gray-800 border rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold">Filter by Skills</h3>
-                {selectedSkills.length > 0 && (
+                {(selectedSkills.length > 0 || showVerifiedOnly) && (
                   <button onClick={clearFilters} className="text-sm text-primary hover:underline">
                     Clear all filters
                   </button>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {AVAILABLE_SKILLS.map((skill) => (
                   <button
                     key={skill}
@@ -204,13 +215,25 @@ export default function Freelancers() {
                   </button>
                 ))}
               </div>
+
+              <div className="border-t pt-4 mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showVerifiedOnly}
+                    onChange={() => setShowVerifiedOnly(!showVerifiedOnly)}
+                    className="rounded text-primary"
+                  />
+                  <span>Show verified freelancers only</span>
+                </label>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Selected Filters */}
-      {selectedSkills.length > 0 && (
+      {(selectedSkills.length > 0 || showVerifiedOnly) && (
         <div className="flex flex-wrap gap-2 mb-6">
           {selectedSkills.map((skill) => (
             <div key={skill} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm flex items-center">
@@ -220,6 +243,17 @@ export default function Freelancers() {
               </button>
             </div>
           ))}
+          {showVerifiedOnly && (
+            <div className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-3 py-1 rounded-full text-sm flex items-center">
+              Verified Only
+              <button
+                onClick={() => setShowVerifiedOnly(false)}
+                className="ml-2 hover:bg-green-200 dark:hover:bg-green-800/50 rounded-full"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -270,7 +304,10 @@ function FreelancerCard({ freelancer }) {
         </div>
 
         <div className="flex-grow">
-          <h3 className="font-bold text-lg">{freelancer.name}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-lg">{freelancer.name}</h3>
+            {freelancer.verified && <VerificationBadge status="verified" size="sm" />}
+          </div>
           <p className="text-primary font-medium">{freelancer.title}</p>
 
           <div className="flex items-center mt-1 mb-2">
@@ -289,8 +326,13 @@ function FreelancerCard({ freelancer }) {
 
           <div className="flex flex-wrap gap-2 mt-3">
             {freelancer.skills.map((skill) => (
-              <span key={skill} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+              <span
+                key={skill}
+                className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded flex items-center gap-1"
+              >
                 {skill}
+                {/* Randomly show some skills as verified for demo purposes */}
+                {Math.random() > 0.5 && <VerificationBadge status="verified" size="sm" />}
               </span>
             ))}
           </div>

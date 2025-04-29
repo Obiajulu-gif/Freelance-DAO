@@ -176,7 +176,11 @@ function JobCard({ title, budget, duration, skills, company, featured, onClick }
       onClick={onClick}
     >
       <div className="h-40 bg-gray-100 dark:bg-gray-800 relative">
-        <img src="/placeholder.svg?height=160&width=400" alt="Job" className="w-full h-full object-cover" />
+        <img
+          src={featured ? "/web3-dev.png" : "/blockchain-dev.png"}
+          alt="Job"
+          className="w-full h-full object-cover"
+        />
         {featured && (
           <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded text-xs font-bold">
             Featured
@@ -228,7 +232,17 @@ function FreelancerCard({ name, title, rating, hourlyRate, skills, onClick }) {
     >
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-          <img src="/placeholder.svg?height=64&width=64" alt="Freelancer" className="w-full h-full object-cover" />
+          <img
+            src={
+              name === "Alex Johnson"
+                ? "/thoughtful-portrait.png"
+                : name === "Sarah Williams"
+                  ? "/diverse-group-chatting.png"
+                  : "/diverse-group-city.png"
+            }
+            alt={name}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="flex-grow">
@@ -350,6 +364,7 @@ export default function Home() {
       icon: <Code size={24} />,
       description: "1,234+ freelancers",
       skills: ["React", "Next.js", "Web3.js", "ethers.js"],
+      image: "/web3-dev.png",
     },
     {
       id: "blockchain",
@@ -357,6 +372,7 @@ export default function Home() {
       icon: <Image src="/blockchain-icon.svg" width={24} height={24} alt="Blockchain Icon" />,
       description: "876+ freelancers",
       skills: ["Consensus", "Tokenomics", "Security", "Architecture"],
+      image: "/blockchain-dev.png",
     },
     {
       id: "smart-contracts",
@@ -364,6 +380,7 @@ export default function Home() {
       icon: <Image src="/smart-contract-icon.svg" width={24} height={24} alt="Smart Contract Icon" />,
       description: "543+ freelancers",
       skills: ["Solidity", "Rust", "Auditing", "Security"],
+      image: "/smart-contract.png",
     },
     {
       id: "graphic-design",
@@ -371,6 +388,7 @@ export default function Home() {
       icon: <Paintbrush size={24} />,
       description: "1,450+ freelancers",
       skills: ["UI/UX", "Branding", "Illustration", "Motion Graphics"],
+      image: "/placeholder.svg?height=200&width=300&query=graphic design",
     },
     {
       id: "content-writing",
@@ -378,6 +396,7 @@ export default function Home() {
       icon: <FileText size={24} />,
       description: "1,280+ freelancers",
       skills: ["Copywriting", "Technical Writing", "SEO", "Editing"],
+      image: "/placeholder.svg?height=200&width=300&query=content writing",
     },
     {
       id: "marketing",
@@ -385,6 +404,7 @@ export default function Home() {
       icon: <BarChart3 size={24} />,
       description: "950+ freelancers",
       skills: ["Social Media", "SEO", "Analytics", "Growth"],
+      image: "/placeholder.svg?height=200&width=300&query=digital marketing",
     },
     {
       id: "nft",
@@ -392,6 +412,7 @@ export default function Home() {
       icon: <Image src="/nft-icon.svg" width={24} height={24} alt="NFT Icon" />,
       description: "987+ freelancers",
       skills: ["Illustration", "3D Modeling", "Animation", "Minting"],
+      image: "/nft-art.png",
     },
     {
       id: "defi",
@@ -399,6 +420,7 @@ export default function Home() {
       icon: <Image src="/defi-icon.svg" width={24} height={24} alt="DeFi Icon" />,
       description: "432+ freelancers",
       skills: ["Lending", "DEX", "Yield Farming", "Staking"],
+      image: "/defi-concept.png",
     },
     {
       id: "dao",
@@ -406,6 +428,7 @@ export default function Home() {
       icon: <Image src="/dao-icon.svg" width={24} height={24} alt="DAO Icon" />,
       description: "321+ freelancers",
       skills: ["Governance", "Treasury", "Community", "Voting"],
+      image: "/dao-governance.png",
     },
   ]
 
@@ -610,7 +633,7 @@ export default function Home() {
                   className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl"
                 >
                   <Image
-                    src="/hero-freelancers.png"
+                    src="/hero-image.png"
                     alt="FreeLance DAO - Hybrid Freelancing Platform"
                     width={600}
                     height={400}
@@ -1139,15 +1162,6 @@ export default function Home() {
             <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
-                  d="M12 0C5.373 0 0 5.373 0 12C0 17.302 3.438 21.8 8.207 23.387C8.806 23.498 9 23.126 9 22.81V20.576C5.662 21.302 4.967 19.16 4.967 19.16C4.421 17.773 3.634 17.404 3.634 17.404C2.545 16.659 3.717 16.675 3.717 16.675C4.922 16.759 5.556 17.912 5.556 17.912C6.626 19.746 8.363 19.216 9.048 18.909C9.155 18.134 9.466 17.604 9.81 17.305C7.145 17 4.343 15.971 4.343 11.374C4.343 10.063 4.812 8.993 5.579 8.153C5.455 7.85 5.044 6.629 5.696 4.977C5.696 4.977 6.704 4.655 8.997 6.207C9.954 5.941 10.98 5.808 12 5.803C13.02 5.808 14.047 5.941 15.006 6.207C17.297 4.655 18.303 4.977 18.303 4.977C18.956 6.63 18.545 7.851 18.421 8.153C19.191 8.993 19.656 10.064 19.656 11.374C19.656 15.983 16.849 16.998 14.177 17.295C14.607 17.667 15 18.397 15 19.517V22.81C15 23.129 15.192 23.504 15.801 23.386C20.566 21.797 24 17.3 24 12C24 5.373 18.627 0 12 0Z"
-                  fill="currentColor"
-                />
-              </svg>
-              <span>GitHub</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
                   d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.79 15.71 17.57V20.34H19.28C21.36 18.42 22.56 15.6 22.56 12.25Z"
                   fill="#4285F4"
                 />
@@ -1165,6 +1179,15 @@ export default function Home() {
                 />
               </svg>
               <span>Google</span>
+            </button>
+            <button className="flex items-center justify-center gap-2 p-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 0C5.373 0 0 5.373 0 12C0 17.302 3.438 21.8 8.207 23.387C8.806 23.498 9 23.126 9 22.81V20.576C5.662 21.302 4.967 19.16 4.967 19.16C4.421 17.773 3.634 17.404 3.634 17.404C2.545 16.659 3.717 16.675 3.717 16.675C4.922 16.759 5.556 17.912 5.556 17.912C6.626 19.746 8.363 19.216 9.048 18.909C9.155 18.134 9.466 17.604 9.81 17.305C7.145 17 4.343 15.971 4.343 11.374C4.343 10.063 4.812 8.993 5.579 8.153C5.455 7.85 5.044 6.629 5.696 4.977C5.696 4.977 6.704 4.655 8.997 6.207C9.954 5.941 10.98 5.808 12 5.803C13.02 5.808 14.047 5.941 15.006 6.207C17.297 4.655 18.303 4.977 18.303 4.977C18.956 6.63 18.545 7.851 18.421 8.153C19.191 8.993 19.656 10.064 19.656 11.374C19.656 15.983 16.849 16.998 14.177 17.295C14.607 17.667 15 18.397 15 19.517V22.81C15 23.129 15.192 23.504 15.801 23.386C20.566 21.797 24 17.3 24 12C24 5.373 18.627 0 12 0Z"
+                  fill="currentColor"
+                />
+              </svg>
+              <span>GitHub</span>
             </button>
           </div>
         </div>
