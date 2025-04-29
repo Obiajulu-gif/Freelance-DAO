@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Filter, Star, Award, Users, X } from "lucide-react"
+import { Search, Filter, Star, Award, Users, X, MapPin, Globe, Mail, Phone, CheckCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import Modal from "@/components/Modal"
 
 // Sample data for agencies
 const AGENCIES_DATA = [
@@ -16,6 +17,38 @@ const AGENCIES_DATA = [
     experts: 12,
     skills: ["Smart Contracts", "DeFi", "NFT", "Web3"],
     image: "/abstract-agency-logo.png",
+    location: "San Francisco, CA",
+    foundedYear: 2018,
+    website: "blockchainbuilders.io",
+    email: "contact@blockchainbuilders.io",
+    phone: "+1 (555) 123-4567",
+    description:
+      "BlockChain Builders is a leading Web3 development agency specializing in building decentralized applications, smart contracts, and blockchain infrastructure. Our team of experts has worked with numerous startups and established companies to bring their blockchain visions to life.",
+    services: [
+      "Smart Contract Development",
+      "DApp Development",
+      "Blockchain Integration",
+      "NFT Marketplace Creation",
+      "Security Audits",
+    ],
+    clients: ["CryptoVentures", "DeFi Protocol", "NFT Collective"],
+    teamMembers: [
+      {
+        name: "David Chen",
+        role: "Founder & CEO",
+        image: "/thoughtful-portrait.png",
+      },
+      {
+        name: "Sarah Johnson",
+        role: "Lead Blockchain Developer",
+        image: "/diverse-group-chatting.png",
+      },
+      {
+        name: "Michael Rodriguez",
+        role: "Smart Contract Specialist",
+        image: "/diverse-group-city.png",
+      },
+    ],
   },
   {
     id: 2,
@@ -26,7 +59,39 @@ const AGENCIES_DATA = [
     projects: 42,
     experts: 18,
     skills: ["Solana", "Tokenomics", "DeFi", "Security"],
-    image: "/placeholder.svg?height=80&width=80&query=logo1",
+    image: "/abstract-geometric-logo.png",
+    location: "New York, NY",
+    foundedYear: 2020,
+    website: "solanasolutions.com",
+    email: "info@solanasolutions.com",
+    phone: "+1 (555) 987-6543",
+    description:
+      "Solana Solutions is a specialized blockchain consulting firm focused on the Solana ecosystem. We provide end-to-end services from tokenomics design to full implementation of Solana-based applications and protocols.",
+    services: [
+      "Solana Program Development",
+      "Tokenomics Design",
+      "Protocol Architecture",
+      "Security Audits",
+      "Performance Optimization",
+    ],
+    clients: ["SolFi", "Solana Ventures", "Serum DEX"],
+    teamMembers: [
+      {
+        name: "Emma Wilson",
+        role: "Founder & Lead Consultant",
+        image: "/diverse-group-chatting.png",
+      },
+      {
+        name: "James Taylor",
+        role: "Senior Solana Developer",
+        image: "/thoughtful-portrait.png",
+      },
+      {
+        name: "Olivia Brown",
+        role: "Tokenomics Specialist",
+        image: "/diverse-group-city.png",
+      },
+    ],
   },
   {
     id: 3,
@@ -37,7 +102,39 @@ const AGENCIES_DATA = [
     projects: 78,
     experts: 24,
     skills: ["NFT", "Digital Art", "Marketplace", "Community"],
-    image: "/placeholder.svg?height=80&width=80&query=logo2",
+    image: "/abstract-geometric-logo.png",
+    location: "Los Angeles, CA",
+    foundedYear: 2019,
+    website: "nftcreatorscollective.art",
+    email: "create@nftcreatorscollective.art",
+    phone: "+1 (555) 456-7890",
+    description:
+      "NFT Creators Collective brings together digital artists, developers, and marketers to create compelling NFT experiences. We handle everything from concept development to marketplace launch and community building.",
+    services: [
+      "NFT Collection Creation",
+      "Marketplace Development",
+      "Community Management",
+      "Marketing Campaigns",
+      "Artist Collaborations",
+    ],
+    clients: ["Digital Dreams Gallery", "CryptoArtists", "MetaCollectibles"],
+    teamMembers: [
+      {
+        name: "Sophia Martinez",
+        role: "Creative Director",
+        image: "/diverse-group-chatting.png",
+      },
+      {
+        name: "Lucas Kim",
+        role: "Lead NFT Developer",
+        image: "/thoughtful-portrait.png",
+      },
+      {
+        name: "Isabella Garcia",
+        role: "Community Manager",
+        image: "/diverse-group-city.png",
+      },
+    ],
   },
   {
     id: 4,
@@ -48,7 +145,39 @@ const AGENCIES_DATA = [
     projects: 31,
     experts: 15,
     skills: ["DeFi", "Yield Farming", "Staking", "Lending"],
-    image: "/placeholder.svg?height=80&width=80&query=logo3",
+    image: "/abstract-geometric-logo.png",
+    location: "Miami, FL",
+    foundedYear: 2020,
+    website: "defiarchitects.finance",
+    email: "build@defiarchitects.finance",
+    phone: "+1 (555) 789-0123",
+    description:
+      "DeFi Architects designs and builds cutting-edge decentralized finance protocols. Our team specializes in creating secure, efficient, and innovative DeFi solutions that maximize yield while minimizing risk.",
+    services: [
+      "Protocol Design & Development",
+      "Yield Optimization Strategies",
+      "Liquidity Pool Implementation",
+      "Governance Systems",
+      "Economic Model Design",
+    ],
+    clients: ["YieldMax Finance", "DeFi Protocol", "Staking Solutions"],
+    teamMembers: [
+      {
+        name: "Robert Johnson",
+        role: "Founder & Protocol Architect",
+        image: "/thoughtful-portrait.png",
+      },
+      {
+        name: "Amanda Lee",
+        role: "Financial Engineer",
+        image: "/diverse-group-chatting.png",
+      },
+      {
+        name: "Daniel Smith",
+        role: "Smart Contract Auditor",
+        image: "/diverse-group-city.png",
+      },
+    ],
   },
 ]
 
@@ -74,6 +203,8 @@ export default function Agencies() {
   const [agencies, setAgencies] = useState([])
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState("rating") // rating, price, projects
+  const [selectedAgency, setSelectedAgency] = useState(null)
+  const [isAgencyModalOpen, setIsAgencyModalOpen] = useState(false)
 
   // Simulate loading data
   useEffect(() => {
@@ -108,6 +239,11 @@ export default function Agencies() {
   const clearFilters = () => {
     setSelectedCategory("All")
     setSearchTerm("")
+  }
+
+  const openAgencyModal = (agency) => {
+    setSelectedAgency(agency)
+    setIsAgencyModalOpen(true)
   }
 
   return (
@@ -238,7 +374,7 @@ export default function Agencies() {
       ) : filteredAgencies.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-6">
           {filteredAgencies.map((agency) => (
-            <AgencyCard key={agency.id} agency={agency} />
+            <AgencyCard key={agency.id} agency={agency} onViewProfile={() => openAgencyModal(agency)} />
           ))}
         </div>
       ) : (
@@ -253,11 +389,142 @@ export default function Agencies() {
           </button>
         </div>
       )}
+
+      {/* Agency Details Modal */}
+      <Modal isOpen={isAgencyModalOpen} onClose={() => setIsAgencyModalOpen(false)} title="Agency Details">
+        {selectedAgency && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+              <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                <img
+                  src={selectedAgency.image || "/placeholder.svg"}
+                  alt={selectedAgency.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="text-center sm:text-left">
+                <h2 className="text-xl font-bold">{selectedAgency.name}</h2>
+                <p className="text-primary font-medium">{selectedAgency.title}</p>
+                <div className="flex items-center justify-center sm:justify-start mt-1">
+                  <div className="flex items-center text-yellow-500 mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        fill="currentColor"
+                        className={i < Math.floor(selectedAgency.rating) ? "" : "opacity-50"}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-500">({selectedAgency.rating})</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin size={16} className="text-gray-400" />
+                <span>{selectedAgency.location}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Award size={16} className="text-gray-400" />
+                <span>Founded in {selectedAgency.foundedYear}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe size={16} className="text-gray-400" />
+                <a
+                  href={`https://${selectedAgency.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {selectedAgency.website}
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">About</h3>
+              <p className="text-gray-600 dark:text-gray-300">{selectedAgency.description}</p>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Services</h3>
+              <ul className="space-y-1">
+                {selectedAgency.services.map((service, index) => (
+                  <li key={index} className="flex items-start">
+                    <CheckCircle size={16} className="text-primary mr-2 mt-0.5" />
+                    <span>{service}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Expertise</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedAgency.skills.map((skill) => (
+                  <span key={skill} className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Key Team Members</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {selectedAgency.teamMembers.map((member, index) => (
+                  <div key={index} className="flex flex-col items-center text-center">
+                    <div className="w-16 h-16 rounded-full overflow-hidden mb-2">
+                      <img
+                        src={member.image || "/placeholder.svg"}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h4 className="font-medium">{member.name}</h4>
+                    <p className="text-sm text-gray-500">{member.role}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Notable Clients</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedAgency.clients.map((client, index) => (
+                  <span key={index} className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                    {client}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t pt-4 flex flex-col sm:flex-row gap-3 justify-between items-center">
+              <div>
+                <span className="font-bold text-lg">${selectedAgency.hourlyRate}</span>
+                <span className="text-gray-500 text-sm">/hr</span>
+              </div>
+              <div className="flex gap-2">
+                <button className="btn-outline py-2 px-4 flex items-center gap-2">
+                  <Mail size={16} />
+                  Contact
+                </button>
+                <button className="btn-primary py-2 px-4 flex items-center gap-2">
+                  <Phone size={16} />
+                  Schedule Call
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
 
-function AgencyCard({ agency }) {
+function AgencyCard({ agency, onViewProfile }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -315,7 +582,9 @@ function AgencyCard({ agency }) {
             <span className="font-bold text-lg">${agency.hourlyRate}</span>
             <span className="text-gray-500 text-sm">/hr</span>
           </div>
-          <button className="btn-outline text-sm py-1">View Profile</button>
+          <button onClick={onViewProfile} className="btn-outline text-sm py-1">
+            View Profile
+          </button>
         </div>
       </div>
     </motion.div>

@@ -13,8 +13,12 @@ import {
   BookmarkCheck,
   ChevronDown,
   ArrowUpDown,
+  CheckCircle,
+  ExternalLink,
+  MessageSquare,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import Modal from "@/components/Modal"
 
 // Sample data for projects
 const PROJECTS_DATA = [
@@ -547,162 +551,145 @@ export default function Projects() {
       )}
 
       {/* Project Details Modal */}
-      <AnimatePresence>
+      <Modal isOpen={selectedProject !== null} onClose={() => setSelectedProject(null)} title="Project Details">
         {selectedProject && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-            onClick={() => setSelectedProject(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative">
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="h-48 bg-gray-200 relative">
+                <img
+                  src={selectedProject.image || "/placeholder.svg"}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-between items-start">
+              <h2 className="text-2xl font-bold">{selectedProject.title}</h2>
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setSelectedProject(null)}
-                  className="absolute top-4 right-4 bg-white dark:bg-gray-700 rounded-full p-1 shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 z-10"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleSaveProject(selectedProject.id)
+                  }}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
                 >
-                  <X size={20} />
+                  {savedProjects.includes(selectedProject.id) ? (
+                    <BookmarkCheck size={20} className="text-primary" />
+                  ) : (
+                    <Bookmark size={20} />
+                  )}
                 </button>
+                <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                  <Share2 size={20} />
+                </button>
+              </div>
+            </div>
 
-                <div className="h-64 bg-gray-200 relative">
-                  <img
-                    src={selectedProject.image || "/placeholder.svg"}
-                    alt={selectedProject.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center">
+                <Star size={16} className="text-yellow-400 fill-yellow-400" />
+                <span className="ml-1 font-medium">{selectedProject.rating}</span>
+              </div>
+              <span className="text-gray-500">({selectedProject.reviews} reviews)</span>
+            </div>
 
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-2xl font-bold">{selectedProject.title}</h2>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleSaveProject(selectedProject.id)
-                        }}
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
-                      >
-                        {savedProjects.includes(selectedProject.id) ? (
-                          <BookmarkCheck size={20} className="text-primary" />
-                        ) : (
-                          <Bookmark size={20} />
-                        )}
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
-                        <Share2 size={20} />
-                      </button>
-                    </div>
-                  </div>
+            <div className="flex flex-wrap gap-2">
+              {selectedProject.skills.map((skill) => (
+                <span key={skill} className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                  {skill}
+                </span>
+              ))}
+            </div>
 
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center">
-                      <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                      <span className="ml-1 font-medium">{selectedProject.rating}</span>
-                    </div>
-                    <span className="text-gray-500">({selectedProject.reviews} reviews)</span>
-                  </div>
+            <p className="text-gray-600 dark:text-gray-300">{selectedProject.longDescription}</p>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedProject.skills.map((skill) => (
-                      <span key={skill} className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+            <div>
+              <h3 className="font-bold text-lg mb-3">What's Included</h3>
+              <ul className="space-y-2">
+                {selectedProject.features.map((feature, index) => (
+                  <li key={index} className="flex items-start">
+                    <CheckCircle size={16} className="text-primary mr-2 mt-0.5" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-                  <p className="text-gray-600 dark:text-gray-300 mb-6">{selectedProject.longDescription}</p>
-
-                  <div className="mb-6">
-                    <h3 className="font-bold text-lg mb-3">What's Included</h3>
-                    <ul className="space-y-2">
-                      {selectedProject.features.map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                          <div className="mr-2 mt-1 text-primary">✓</div>
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="border-t pt-6 mb-6">
-                    <h3 className="font-bold text-lg mb-4">About the Creator</h3>
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={selectedProject.creator.image || "/placeholder.svg"}
-                        alt={selectedProject.creator.name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                      <div>
-                        <h4 className="font-bold">{selectedProject.creator.name}</h4>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Star size={14} className="text-yellow-400 fill-yellow-400" />
-                          <span className="ml-1">{selectedProject.creator.rating}</span>
-                          <span className="mx-2">•</span>
-                          <span>{selectedProject.creator.projectsCompleted} projects completed</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Related Projects */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-bold text-lg mb-4">Similar Projects</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {getRelatedProjects(selectedProject).map((project) => (
-                        <div
-                          key={project.id}
-                          className="border rounded-lg overflow-hidden hover:border-primary cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedProject(project)
-                          }}
-                        >
-                          <div className="h-24 bg-gray-200">
-                            <img
-                              src={project.image || "/placeholder.svg"}
-                              alt={project.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="p-3">
-                            <h4 className="font-medium text-sm line-clamp-1">{project.title}</h4>
-                            <div className="flex items-center text-xs text-gray-500 mt-1">
-                              <Star size={12} className="text-yellow-400 fill-yellow-400" />
-                              <span className="ml-1">{project.rating}</span>
-                              <span className="mx-1">•</span>
-                              <span>${project.price}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t mt-6 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div>
-                      <div className="text-gray-500 text-sm">Starting at</div>
-                      <div className="text-2xl font-bold">${selectedProject.price}</div>
-                      <div className="text-gray-500 text-sm">{selectedProject.duration} delivery</div>
-                    </div>
-                    <div className="flex gap-3 w-full sm:w-auto">
-                      <button className="btn-outline py-2 px-4 flex-1 sm:flex-initial">Contact Creator</button>
-                      <button className="btn-primary py-2 px-4 flex-1 sm:flex-initial">Purchase Now</button>
-                    </div>
+            <div className="border-t pt-6">
+              <h3 className="font-bold text-lg mb-4">About the Creator</h3>
+              <div className="flex items-center gap-4">
+                <img
+                  src={selectedProject.creator.image || "/placeholder.svg"}
+                  alt={selectedProject.creator.name}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+                <div>
+                  <h4 className="font-bold">{selectedProject.creator.name}</h4>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Star size={14} className="text-yellow-400 fill-yellow-400" />
+                    <span className="ml-1">{selectedProject.creator.rating}</span>
+                    <span className="mx-2">•</span>
+                    <span>{selectedProject.creator.projectsCompleted} projects completed</span>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+
+            {/* Related Projects */}
+            <div className="border-t pt-6">
+              <h3 className="font-bold text-lg mb-4">Similar Projects</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {getRelatedProjects(selectedProject).map((project) => (
+                  <div
+                    key={project.id}
+                    className="border rounded-lg overflow-hidden hover:border-primary cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedProject(project)
+                    }}
+                  >
+                    <div className="h-24 bg-gray-200">
+                      <img
+                        src={project.image || "/placeholder.svg"}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <h4 className="font-medium text-sm line-clamp-1">{project.title}</h4>
+                      <div className="flex items-center text-xs text-gray-500 mt-1">
+                        <Star size={12} className="text-yellow-400 fill-yellow-400" />
+                        <span className="ml-1">{project.rating}</span>
+                        <span className="mx-1">•</span>
+                        <span>${project.price}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t mt-6 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>
+                <div className="text-gray-500 text-sm">Starting at</div>
+                <div className="text-2xl font-bold">${selectedProject.price}</div>
+                <div className="text-gray-500 text-sm">{selectedProject.duration} delivery</div>
+              </div>
+              <div className="flex gap-3 w-full sm:w-auto">
+                <button className="btn-outline py-2 px-4 flex items-center gap-2 flex-1 sm:flex-initial">
+                  <MessageSquare size={16} />
+                  Contact Creator
+                </button>
+                <button className="btn-primary py-2 px-4 flex items-center gap-2 flex-1 sm:flex-initial">
+                  <ExternalLink size={16} />
+                  Purchase Now
+                </button>
+              </div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      </Modal>
     </div>
   )
 }

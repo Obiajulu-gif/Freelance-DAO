@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Filter, Star, X } from "lucide-react"
+import { Search, Filter, Star, X, MapPin, Calendar, Briefcase, CheckCircle, Mail, ExternalLink } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import VerificationBadge from "@/components/skill-verification/VerificationBadge"
+import Modal from "@/components/Modal"
 
 // Sample data for freelancers
 const FREELANCERS_DATA = [
@@ -16,6 +17,19 @@ const FREELANCERS_DATA = [
     skills: ["React", "Node.js", "Solana", "Web3"],
     image: "/thoughtful-portrait.png",
     verified: true,
+    location: "San Francisco, CA",
+    memberSince: "January 2022",
+    completedProjects: 32,
+    bio: "Full stack developer with 5+ years of experience in web and blockchain development. Specialized in building decentralized applications and integrating Web3 technologies.",
+    languages: ["English (Native)", "Spanish (Fluent)"],
+    education: [
+      {
+        degree: "B.S. Computer Science",
+        institution: "Stanford University",
+        year: "2018",
+      },
+    ],
+    verifiedSkills: ["React", "Solana"],
   },
   {
     id: 2,
@@ -26,6 +40,19 @@ const FREELANCERS_DATA = [
     skills: ["Solidity", "Rust", "Smart Contracts", "DeFi"],
     image: "/diverse-group-chatting.png",
     verified: false,
+    location: "New York, NY",
+    memberSince: "March 2021",
+    completedProjects: 47,
+    bio: "Blockchain expert specializing in smart contract development. Experienced in DeFi protocols, NFT marketplaces, and DAO governance systems.",
+    languages: ["English (Native)", "French (Intermediate)"],
+    education: [
+      {
+        degree: "M.S. Computer Engineering",
+        institution: "MIT",
+        year: "2020",
+      },
+    ],
+    verifiedSkills: ["Solidity", "DeFi"],
   },
   {
     id: 3,
@@ -36,6 +63,19 @@ const FREELANCERS_DATA = [
     skills: ["Figma", "UI/UX", "Web Design", "Mobile Design"],
     image: "/diverse-group-chatting.png",
     verified: true,
+    location: "Austin, TX",
+    memberSince: "June 2022",
+    completedProjects: 18,
+    bio: "Creative UI/UX designer with a passion for creating intuitive and engaging user experiences. Specialized in designing interfaces for Web3 applications.",
+    languages: ["English (Native)"],
+    education: [
+      {
+        degree: "B.A. Design",
+        institution: "Rhode Island School of Design",
+        year: "2021",
+      },
+    ],
+    verifiedSkills: ["UI/UX", "Web Design"],
   },
   {
     id: 4,
@@ -46,6 +86,19 @@ const FREELANCERS_DATA = [
     skills: ["Ethereum", "Solana", "Architecture", "Security"],
     image: "/diverse-group-chatting.png",
     verified: false,
+    location: "London, UK",
+    memberSince: "February 2020",
+    completedProjects: 56,
+    bio: "Blockchain architect with expertise in designing secure and scalable blockchain systems. Experience with multiple blockchain platforms and consensus mechanisms.",
+    languages: ["English (Native)", "German (Fluent)"],
+    education: [
+      {
+        degree: "Ph.D. Computer Science",
+        institution: "University of Cambridge",
+        year: "2019",
+      },
+    ],
+    verifiedSkills: ["Ethereum", "Security"],
   },
   {
     id: 5,
@@ -56,6 +109,19 @@ const FREELANCERS_DATA = [
     skills: ["NFT", "ERC-721", "Marketplace", "Digital Art"],
     image: "/diverse-group-city.png",
     verified: true,
+    location: "Vancouver, Canada",
+    memberSince: "April 2021",
+    completedProjects: 29,
+    bio: "NFT developer specializing in creating and implementing NFT collections and marketplaces. Experienced in working with digital artists and creators.",
+    languages: ["English (Fluent)", "Mandarin (Native)"],
+    education: [
+      {
+        degree: "B.S. Software Engineering",
+        institution: "University of British Columbia",
+        year: "2020",
+      },
+    ],
+    verifiedSkills: ["NFT", "ERC-721"],
   },
   {
     id: 6,
@@ -66,6 +132,19 @@ const FREELANCERS_DATA = [
     skills: ["DeFi", "Yield Farming", "Staking", "Tokenomics"],
     image: "/diverse-group-city.png",
     verified: true,
+    location: "Berlin, Germany",
+    memberSince: "August 2021",
+    completedProjects: 24,
+    bio: "DeFi specialist with deep knowledge of decentralized finance protocols and tokenomics. Experienced in designing and implementing yield farming and staking mechanisms.",
+    languages: ["English (Fluent)", "German (Native)"],
+    education: [
+      {
+        degree: "M.S. Financial Engineering",
+        institution: "Technical University of Berlin",
+        year: "2019",
+      },
+    ],
+    verifiedSkills: ["DeFi", "Tokenomics"],
   },
 ]
 
@@ -102,6 +181,8 @@ export default function Freelancers() {
   const [freelancers, setFreelancers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false)
+  const [selectedFreelancer, setSelectedFreelancer] = useState(null)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   // Simulate loading data
   useEffect(() => {
@@ -141,6 +222,11 @@ export default function Freelancers() {
     setSelectedSkills([])
     setSearchTerm("")
     setShowVerifiedOnly(false)
+  }
+
+  const openProfileModal = (freelancer) => {
+    setSelectedFreelancer(freelancer)
+    setIsProfileModalOpen(true)
   }
 
   return (
@@ -267,7 +353,11 @@ export default function Freelancers() {
       ) : filteredFreelancers.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFreelancers.map((freelancer) => (
-            <FreelancerCard key={freelancer.id} freelancer={freelancer} />
+            <FreelancerCard
+              key={freelancer.id}
+              freelancer={freelancer}
+              onViewProfile={() => openProfileModal(freelancer)}
+            />
           ))}
         </div>
       ) : (
@@ -282,11 +372,127 @@ export default function Freelancers() {
           </button>
         </div>
       )}
+
+      {/* Freelancer Profile Modal */}
+      <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} title="Freelancer Profile">
+        {selectedFreelancer && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+              <div className="w-24 h-24 rounded-full overflow-hidden">
+                <img
+                  src={selectedFreelancer.image || "/placeholder.svg"}
+                  alt={selectedFreelancer.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <h2 className="text-xl font-bold">{selectedFreelancer.name}</h2>
+                  {selectedFreelancer.verified && <VerificationBadge status="verified" />}
+                </div>
+                <p className="text-primary font-medium">{selectedFreelancer.title}</p>
+                <div className="flex items-center justify-center sm:justify-start mt-1">
+                  <div className="flex items-center text-yellow-500 mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        fill="currentColor"
+                        className={i < Math.floor(selectedFreelancer.rating) ? "" : "opacity-50"}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-500">({selectedFreelancer.rating})</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin size={16} className="text-gray-400" />
+                <span>{selectedFreelancer.location}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-gray-400" />
+                <span>Member since {selectedFreelancer.memberSince}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Briefcase size={16} className="text-gray-400" />
+                <span>{selectedFreelancer.completedProjects} projects completed</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">About</h3>
+              <p className="text-gray-600 dark:text-gray-300">{selectedFreelancer.bio}</p>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Skills</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedFreelancer.skills.map((skill) => (
+                  <div
+                    key={skill}
+                    className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full"
+                  >
+                    <span>{skill}</span>
+                    {selectedFreelancer.verifiedSkills.includes(skill) && (
+                      <CheckCircle size={14} className="text-green-500" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Languages</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedFreelancer.languages.map((language, index) => (
+                  <span key={index} className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                    {language}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold mb-2">Education</h3>
+              <div className="space-y-2">
+                {selectedFreelancer.education.map((edu, index) => (
+                  <div key={index}>
+                    <p className="font-medium">{edu.degree}</p>
+                    <p className="text-sm text-gray-500">
+                      {edu.institution}, {edu.year}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t pt-4 flex flex-col sm:flex-row gap-3 justify-between items-center">
+              <div>
+                <span className="font-bold text-lg">${selectedFreelancer.hourlyRate}</span>
+                <span className="text-gray-500 text-sm">/hr</span>
+              </div>
+              <div className="flex gap-2">
+                <button className="btn-outline py-2 px-4 flex items-center gap-2">
+                  <Mail size={16} />
+                  Contact
+                </button>
+                <button className="btn-primary py-2 px-4 flex items-center gap-2">
+                  <ExternalLink size={16} />
+                  Hire Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
 
-function FreelancerCard({ freelancer }) {
+function FreelancerCard({ freelancer, onViewProfile }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -325,16 +531,22 @@ function FreelancerCard({ freelancer }) {
           </div>
 
           <div className="flex flex-wrap gap-2 mt-3">
-            {freelancer.skills.map((skill) => (
+            {freelancer.skills.slice(0, 3).map((skill) => (
               <span
                 key={skill}
                 className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded flex items-center gap-1"
               >
                 {skill}
-                {/* Randomly show some skills as verified for demo purposes */}
-                {Math.random() > 0.5 && <VerificationBadge status="verified" size="sm" />}
+                {freelancer.verifiedSkills && freelancer.verifiedSkills.includes(skill) && (
+                  <CheckCircle size={12} className="text-green-500" />
+                )}
               </span>
             ))}
+            {freelancer.skills.length > 3 && (
+              <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                +{freelancer.skills.length - 3} more
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -345,7 +557,9 @@ function FreelancerCard({ freelancer }) {
             <span className="font-bold text-lg">${freelancer.hourlyRate}</span>
             <span className="text-gray-500 text-sm">/hr</span>
           </div>
-          <button className="btn-outline text-sm py-1">View Profile</button>
+          <button onClick={onViewProfile} className="btn-outline text-sm py-1">
+            View Profile
+          </button>
         </div>
       </div>
     </motion.div>
